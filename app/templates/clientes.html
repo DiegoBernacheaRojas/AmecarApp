@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes{% endblock %}
+
+{% block content %}
+<div class="content-title">Clientes</div>
+
+
+<div class="content">
+    <button class="btn btn-success nuevoBtn">Nuevo Cliente</button>
+    <br> <br>
+    <table id="tablaClientes" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Tipo de Cliente</th>
+                <th>Tipo de Documento</th>
+                <th>Numero de Documento</th>
+                <th>Dirección</th>
+                <th>Distrito</th>
+                <th>Sexo</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Fecha de Nacimiento</th>
+                <th>Fecha de Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Carga dinámica -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para agregar un nuevo cliente -->
+<div class="modal fade" id="clienteModal" tabindex="-1" role="dialog" aria-labelledby="clienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="clienteModalLabel">Agregar Nuevo Cliente</h5>
+                <button type="button" class="btn btn-link p-0 xBtn" style="text-decoration: none; " >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario para agregar cliente -->
+                <form id="clienteForm">
+                    <div class="row">
+                        <!-- Columna izquierda -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nombreCliente">Nombre</label>
+                                <input type="text" class="form-control" id="nombreCliente" required>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <label for="tipoCliente">Tipo de Cliente</label>
+                                <select class="form-control" id="tipoCliente">
+                                    <option value="Regular">Regular</option>
+                                    <option value="Premium">Premium</option>
+                                    <option value="Corporativo">Corporativo</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <label for="tipoDocumento">Tipo de Documento</label>
+                                <select class="form-control" id="tipoDocumento">
+                                </select>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <label for="numeroDocumento">Número de Documento</label>
+                                <input type="text" class="form-control" id="numeroDocumento" required>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <label for="sexoCliente">Sexo</label>
+                                <select class="form-control" id="sexoCliente">
+                                </select>
+                            </div>
+                            <br>
+                        </div>
+
+                        <!-- Columna derecha -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="direccionCliente">Dirección</label>
+                                <input type="text" class="form-control" id="direccionCliente" required>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <label for="distritoCliente">Distrito</label>
+                                <select class="form-control" id="distritonCliente">
+                                </select>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <label for="telefonoCliente">Teléfono</label>
+                                <input type="text" class="form-control" id="telefonoCliente" required>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <label for="correoCliente">Correo</label>
+                                <input type="email" class="form-control" id="correoCliente" required>
+                            </div>
+                            <br>
+                            <div class="form-group">
+                                <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                                <input type="date" class="form-control" id="fechaNacimiento" required>
+                            </div>
+                            <br>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary cerrarBtn">Cerrar</button>
+                <button type="submit" class="btn btn-primary" id="guardarCliente">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" role="dialog" aria-labelledby="confirmarEliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmación de Eliminación</h5>
+                <button type="button" class="btn btn-link p-0 xBtn" style="text-decoration: none; " >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar este cliente?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary cerrarBtn" >Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="../static/js/clientes.js"></script>
+{% endblock %}
