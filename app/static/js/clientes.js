@@ -162,6 +162,7 @@ $(document).ready(function () {
     // abrir modal registro
     $(document).on('click', '.nuevoBtn', function () {
         $('#clienteModalLabel').text('Registrar Cliente');
+        $('#guardarCliente').text('Registrar');
         $('#clienteModal').modal('show');
     });
 
@@ -185,18 +186,37 @@ $(document).ready(function () {
     // Acción para editar cliente    
     $(document).on('click', '.editarBtn', function () {
         clienteId = $(this).data('id');
-        // Aquí puedes hacer una petición AJAX para obtener los datos del cliente
-        // y llenar el formulario con esos datos
-
-        // Simulando la carga de datos para edición:
         $('#clienteModalLabel').text('Editar Cliente');
-        $('#nombreCliente').val('Nombre del cliente'); // Cargar datos reales
-        $('#tipoCliente').val('Tipo de Cliente');
-        $('#tipoDocumento').val('DNI');
-        $('#numeroDocumento').val('12345678');
-        $('#direccionCliente').val('Dirección');
-        $('#telefonoCliente').val('123456789');
-        $('#correoCliente').val('correo@cliente.com');
+        $('#guardarCliente').text('Actualizar');
+        $.ajax({
+            url: `/api/cliente/getId/${clienteId}`,
+            type: 'GET',
+            success: function (response) {
+                if (response.success) {
+                    // Rellenar los inputs del formulario con los datos obtenidos
+                    const cliente = response.data;
+    
+                    $('#nombreCliente').val(cliente.Nombre);
+                    $('#tipoCliente').val(cliente.TipoCliente);
+                    $('#tipoDocumento').val(cliente.TipoDoc_ID);
+                    $('#numeroDocumento').val(cliente.NumDoc);
+                    $('#sexoCliente').val(cliente.Sexo);
+                    $('#direccionCliente').val(cliente.Direccion);
+                    $('#distritonCliente').val(cliente.Distrito);
+                    $('#telefonoCliente').val(cliente.Telefono);
+                    $('#correoCliente').val(cliente.Correo);
+                    $('#fechaNacimiento').val(cliente.FechaNacimiento);
+    
+                    // Mostrar el modal
+                    $('#clienteModal').modal('show');
+                } else {
+                    alert("Error al obtener los datos del cliente: " + response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("Error en la solicitud: " + error);
+            }
+        });
 
         // Mostrar el modal
         $('#clienteModal').modal('show');
@@ -214,8 +234,8 @@ $(document).ready(function () {
         // Llamar a una API para eliminar el cliente
         // Por ejemplo:
         $.ajax({
-            url: '/api/cliente/delete/' + clienteId,
-            type: 'DELETE',
+            url: '/api/cliente/desactivar/' + clienteId,
+            type: 'POST',
             success: function (response) {
                 // Refrescar la tabla después de eliminar
                 $('#tablaClientes').DataTable().ajax.reload();
@@ -257,7 +277,7 @@ $(document).ready(function () {
                     if (response.success) {
                         $('#tablaClientes').DataTable().ajax.reload();
                         $('#clienteModal').modal('hide');
-                        alert("Cliente editado con éxito.");
+                        //alert("Cliente editado con éxito.");
                     } else {
                         alert("Error al editar el cliente: " + response.message);
                     }
@@ -278,7 +298,7 @@ $(document).ready(function () {
                         $('#tablaClientes').DataTable().ajax.reload();
                         modalClear();
                         $('#clienteModal').modal('hide');
-                        alert("Cliente agregado con éxito.");
+                        //alert("Cliente agregado con éxito.");
                     } else {
                         alert("Error al agregar el cliente: " + response.message);
                     }

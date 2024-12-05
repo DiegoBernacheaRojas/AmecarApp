@@ -24,11 +24,11 @@ def getId(Cliente_ID):
             "message": "Cliente encontrado.",
             "data": {
                 "Cliente_ID": cliente.Cliente_ID,
-                "Sexo": cliente.sexo.Nombre,
-                "Distrito": cliente.distrito.Nombre,
+                "Sexo": cliente.Sexo_ID,
+                "Distrito": cliente.Distrito_Codigo,
                 "Nombre": cliente.Nombre,
                 "TipoCliente": cliente.TipoCliente,
-                "TipoDoc_ID": cliente.tipo_documento.Nombre,
+                "TipoDoc_ID": cliente.TipoDoc_ID,
                 "NumDoc": cliente.NumDoc,
                 "Telefono": cliente.Telefono,
                 "Correo": cliente.Correo,
@@ -50,8 +50,9 @@ def getId(Cliente_ID):
 @login_required
 def getAll():
     try:
-        # Obtener todos los clientes
-        clientes = Cliente.query.all()
+        # Obtener solo los clientes activos
+        clientes = Cliente.query.filter_by(Estado=True).all()  # Cambia `Estado` si el campo tiene otro nombre
+
         
         if not clientes:
             return jsonify({
@@ -183,6 +184,34 @@ def delete(Cliente_ID):
         
         # Eliminar el cliente
         db.session.delete(cliente)
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "Cliente eliminado exitosamente."
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": "Error al eliminar el cliente.",
+            "error": str(e)
+        }), 500
+
+@cliente.route('/desactivar/<int:Cliente_ID>', methods=['POST'])
+@login_required
+def desactivar(Cliente_ID):
+    try:
+        cliente = Cliente.query.get(Cliente_ID)
+
+        if cliente is None:
+            return jsonify({
+                "success": False,
+                "message": "Cliente no encontrado."
+            }), 404
+        
+        # Desactivar el cliente estableciendo 'activo' a False o 0
+        cliente.Estado = False  # o cliente.activo = 0, dependiendo de cómo esté definido en tu modelo
         db.session.commit()
 
         return jsonify({
