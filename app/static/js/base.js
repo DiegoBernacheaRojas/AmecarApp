@@ -28,7 +28,7 @@ document.getElementById('logout-button').addEventListener('click', async functio
         const result = await response.json();
 
         if (result.success) {
-            alert(result.message);
+            //alert(result.message);
             window.location.href = '/';
         } else {
             alert('Error: ' + result.message);
