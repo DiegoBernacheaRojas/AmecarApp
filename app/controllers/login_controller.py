@@ -35,6 +35,8 @@ def post_login():
 
     # Guardar la sesión
     session['user_id'] = empleado.Empleado_ID
+    session['rol'] = empleado.rol.Nombre
+
 
     return jsonify({
         "success": True,

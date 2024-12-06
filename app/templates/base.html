@@ -34,15 +34,21 @@
         <hr>
         <nav class="sidebar-nav">
             <ul>
-                <li><a href="/index" id="ventas-link">Home</a></li>
+                <li><a href="/index" id="home-link">Home</a></li>
             </ul>
         </nav>
         <hr>
         <nav class="sidebar-nav">
             <ul>
+                {% if 'ventas' in permisos %}
                 <li><a href="/ventas" id="ventas-link">Ventas</a></li>
+                {% endif %}
+                {% if 'productos' in permisos %}
                 <li><a href="/productos" id="productos-link">Productos</a></li>
+                {% endif %}
+                {% if 'clientes' in permisos %}
                 <li><a href="/clientes" id="clientes-link">Clientes</a></li>
+                {% endif %}
             </ul>
         </nav>
         <div class="sidebar-footer">
