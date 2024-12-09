@@ -26,12 +26,12 @@ class Producto(db.Model):
 
     Producto_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Subcategoria_ID = db.Column(db.Integer, db.ForeignKey('SubCategoria.Subcategoria_ID'), nullable=False)
+    CodigoBarras = db.Column(db.String(30), unique=True, nullable=False)  # Nuevo campo
     Descripcion = db.Column(db.String(100))
     Precio = db.Column(db.Numeric(10, 2), nullable=False)
     Stock = db.Column(db.Integer, nullable=False)
     FechaIngreso = db.Column(db.Date, nullable=False)
     Estado = db.Column(db.Boolean, nullable=False)
-
     # No es necesario una relación inversa, ya que solo se tiene un solo nivel
     # No se agrega backref en este caso
 

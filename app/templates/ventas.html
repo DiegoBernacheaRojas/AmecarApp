@@ -5,6 +5,60 @@
 {% block content %}
 <div class="content-title">Ventas</div>
 <div class="content">
-    
+    <div class="content-layout">
+        <!-- Columna 1: Productos en Venta -->
+        <div class="productos-columna">
+            <h3>Productos en Venta</h3>
+            <table id="tablaVenta">
+                <thead>
+                    <tr>
+                        <th>Código de Barra</th>
+                        <th>Descripción</th>
+                        <th>Precio Unitario</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí aparecerán los productos agregados -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><strong>Total:</strong></td>
+                        <td id="totalVenta">0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Columna 2: Formularios -->
+        <div class="formulario-columna">
+            <h3>Formulario de Venta</h3>
+            <form id="ventaForm" onsubmit="return false;">
+                <label for="codigo_barras">Código de Barras:</label>
+                <input type="text" id="codigo_barras" name="codigo_barras" autofocus placeholder="Escanee el código aquí" onkeypress="submitCodigo(event)">
+            </form>
+
+            <!-- Formulario de Método de Pago -->
+            <h3>Método de Pago</h3>
+            <form id="metodoPagoForm">
+                <label for="metodo_pago">Seleccione el método de pago:</label>
+                <select id="metodo_pago" name="metodo_pago" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="yape">YAPE</option>
+                    <option value="plin">PLIN</option>
+                </select>
+
+                <!-- Campos adicionales dependiendo del método de pago -->
+                <div id="detallesPago"></div>
+
+                <button type="submit" id="confirmarPago">Confirmar Pago</button>
+            </form>
+        </div>
+    </div>
 </div>
+<link rel="stylesheet" href="../static/css/ventas.css">
+<script src="../static/js/ventas.js"></script>
 {% endblock %}

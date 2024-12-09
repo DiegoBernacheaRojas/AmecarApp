@@ -1,0 +1,234 @@
+/* Encabezado principal */
+.container {
+    display: grid;
+    grid-template-columns: 1.5fr 0.7fr; /* Ajusta las proporciones de las columnas */
+    gap: 20px; /* Espaciado entre columnas */
+}
+
+.columna-1 {
+    background-color: #f9f9f9; /* Color de fondo para prueba */
+    padding: 15px;
+    border: 1px solid #ddd;
+}
+
+.columna-2 {
+    background-color: #e9e9e9; /* Color de fondo para prueba */
+    padding: 15px;
+    border: 1px solid #ddd;
+}
+h1 {
+    text-align: center;
+    color: #0056b3;
+    margin-bottom: 20px;
+}
+.ventaForm{
+    width: 150PX;
+}
+/* Formulario de código de barras */
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    
+    margin: 0 auto;
+}
+
+label {
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Estilo para la tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #0056b3;
+    color: white;
+}
+
+/* Estilo para el cuerpo de la tabla con scroll */
+#tablaVenta tbody {
+    height: 430px;
+    max-height: 430px; /* Limitar la altura máxima */
+    overflow-y: auto;
+    display: block; /* Necesario para el scroll */
+    width: 100%;
+}
+
+#tablaVenta thead,
+#tablaVenta tfoot {
+    display: table; /* Mantener la alineación de las columnas */
+    width: 100%;
+    table-layout: fixed; /* Evitar desajustes en las columnas */
+}
+
+#tablaVenta tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* Footer de la tabla */
+#tablaVenta tfoot {
+    background-color: #f9f9f9;
+    font-weight: bold;
+    text-align: right;
+}
+
+#tablaVenta tfoot td {
+    border-top: 2px solid #ddd;
+}
+
+/* Estilo para el total */
+#totalVenta {
+    font-size: 1.2em;
+    color: green;
+}
+
+/* Estilo para columnas */
+.content-layout {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+   
+}
+
+.productos-columna, .formulario-columna {
+    flex: 1;
+    min-width: 300px; /* Ancho mínimo para columnas más pequeñas */
+}
+
+.productos-columna {
+    margin-right: 20px;
+}
+
+h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+
+td {
+    padding: 10px 30px; /* Espaciado entre celdas */
+    text-align: center;
+}
+
+.cantidad-input {
+    width: 60px; /* Ajustar ancho del input */
+    text-align: center;
+}
+/* Estilo para el cuerpo de la tabla con scroll */
+#tablaVenta tbody {
+    max-height: 400px; /* Limitar la altura máxima */
+    overflow-y: auto;
+    display: block; /* Necesario para el scroll */
+    width: 100%;
+}
+
+#tablaVenta thead,
+#tablaVenta tfoot {
+    display: table; /* Mantener la alineación de las columnas */
+    width: 100%;
+    table-layout: fixed; 
+    /* Evitar desajustes en las columnas */
+}
+
+#tablaVenta tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+#tablaVenta tfoot td {
+    text-align: right; /* Alinea el contenido a la derecha */
+    font-weight: bold; /* Destaca el total */
+    padding-right: 10px; /* Espacio opcional para separación */
+}
+.content-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.content-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.productos-columna, .formulario-columna {
+    flex: 1;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+table thead {
+    background-color: #f2f2f2;
+}
+
+tfoot {
+    font-weight: bold;
+}
+
+#detallesPago {
+    margin-top: 10px;
+    display: none;
+}
+
+button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}

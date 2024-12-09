@@ -7,8 +7,16 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = 'tu_clave_secreta_super_segura'
                                             #"mssql+pyodbc://USER:CONTRASEÑA@SERVIDOR/BASEDEDATOS?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
-    app.config['SQLALCHEMY_DATABASE_URI'] = "mssql+pyodbc://sa:123@DESKTOP-TJK9H4B/Amecar?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
+    #app.config['SQLALCHEMY_DATABASE_URI'] = "mssql+pyodbc://@./SQLEXPRESS/Amecar?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
+    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    #db.init_app(app)
+# Configura la conexión con autenticación de Windows
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        "mssql+pyodbc://@localhost\\SQLEXPRESS/Amecar"
+        "?driver=ODBC+Driver+17+for+SQL+Server&TrustServerCertificate=yes"
+    )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
     db.init_app(app)
 
     # Registrar Blueprints
