@@ -6,6 +6,7 @@ from ..utils import login_required
 
 venta = Blueprint('venta', __name__)
 @venta.route('/buscar_producto', methods=['POST'])
+@login_required()
 def buscar_producto():
     """
     Ruta para buscar un producto por código de barras.
@@ -40,7 +41,7 @@ def buscar_producto():
 
 # Ruta para calcular el total
 @venta.route('/calcular_total', methods=['POST'])
-@login_required
+@login_required()
 def calcular_total():
     # Obtener datos enviados en la solicitud
     data = request.get_json()
