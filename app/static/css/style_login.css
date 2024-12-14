@@ -23,16 +23,6 @@ body {
     width: 300px;
     text-align: center; /* Centra el texto dentro del contenedor */
 }
-
-
-.TRX {
-    color: #000000; /* Color del texto */
-    background-color: #ffed00; /* Color de fondo (resaltador) */
-    padding: 2px 4px; /* Espacio alrededor del texto para simular el resaltador */
-    border-radius: 2px; /* Opcional: redondea las esquinas del resaltador */
-    display: inline; /* Asegura que el resaltador se ajuste al texto */
-}
-
 /* Estilo para el título */
 h1 {
     color: #ffffff; /* Color del texto del título */
