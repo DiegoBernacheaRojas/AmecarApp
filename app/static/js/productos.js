@@ -6,25 +6,15 @@ $(document).ready(function () {
         ajax: {
             url: '/api/producto/getAll', // Endpoint que devuelve los datos en formato JSON
             dataSrc: 'data', // Ruta donde están los datos dentro del JSON de respuesta
-            data: function (d) {
-                // Añadir filtros a la solicitud AJAX
-                d.descripcion = $('#buscarProducto').val();
-                d.subcategoria = $('#filtrarSubcategoria').val();
-                d.estado = $('#filtrarEstado').val();
-            }
         },
         columns: [
-            { data: 'Subcategoria' },
+            { data: 'Producto_ID' },
+            { data: 'SubCategoria' },
+            { data: 'CodigoBarras' },
             { data: 'Descripcion' },
             { data: 'Precio' },
             { data: 'Stock' },
             { data: 'FechaIngreso' },
-            {
-                data: 'Estado',
-                render: function (data) {
-                    return data === 1 ? 'Activo' : 'Inactivo'; // Renderizado de estado
-                }
-            },
             {
                 data: null,
                 render: function (data, type, row) {
@@ -36,6 +26,8 @@ $(document).ready(function () {
             }
         ],
         language: {
+            decimal: ",",
+            thousands: ".",
             lengthMenu: "Mostrar _MENU_ registros por página",
             info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
             infoEmpty: "Mostrando 0 a 0 de 0 registros",
@@ -47,11 +39,19 @@ $(document).ready(function () {
                 previous: "Anterior",
                 next: "Siguiente",
                 last: "Último"
+            },
+            aria: {
+                sortAscending: ": activar para ordenar la columna de manera ascendente",
+                sortDescending: ": activar para ordenar la columna de manera descendente"
             }
         },
-        responsive: true,
-        pageLength: 10,
-        ordering: true
+        responsive: true, // Activar diseño responsivo
+        paging: true, // Habilitar paginación (es la configuración predeterminada)
+        lengthChange: true, // Permitir cambiar el número de filas por página
+        ordering: true, // Habilitar ordenación por columnas
+        searching: true, // Habilitar búsqueda
+        autoWidth: false, // Evitar ajuste automático del ancho
+        scrollX: true, 
     });
 
     // Función para limpiar el modal
@@ -189,6 +189,11 @@ $(document).ready(function () {
         $('#confirmarEliminarModal').modal('hide');
     });
 
+    $(document).on('click', '.xBtn', function () {
+        limpiarModal();
+        $('#productoModal').modal('hide');
+        $('#confirmarEliminarModal').modal('hide');
+    });
     $('#buscarProducto, #filtrarSubcategoria, #filtrarEstado').on('change', function () {
         $('#tablaProductos').DataTable().ajax.reload();
     });

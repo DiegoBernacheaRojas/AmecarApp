@@ -1,23 +1,22 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
+migrate = None
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = 'tu_clave_secreta_super_segura'
                                             #"mssql+pyodbc://USER:CONTRASEÑA@SERVIDOR/BASEDEDATOS?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
-    #app.config['SQLALCHEMY_DATABASE_URI'] = "mssql+pyodbc://@./SQLEXPRESS/Amecar?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
-    #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    #db.init_app(app)
-# Configura la conexión con autenticación de Windows
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-        "mssql+pyodbc://@localhost\\SQLEXPRESS/Amecar"
-        "?driver=ODBC+Driver+17+for+SQL+Server&TrustServerCertificate=yes"
-    )
+    app.config['SQLALCHEMY_DATABASE_URI'] = "mssql+pyodbc://sa:123@DESKTOP-TJK9H4B/Amecar?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
+
+    # Inicializa Flask-Migrate después de inicializar la aplicación y la base de datos
+    global migrate
+    migrate = Migrate(app, db)
 
     # Registrar Blueprints
     from app.controllers.main_controller import main_bp

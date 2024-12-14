@@ -5,19 +5,20 @@ from ..utils import login_required
 
 producto = Blueprint('producto', __name__)
 
-@producto.route('/api/producto/getAll', methods=['GET'])
-@login_required
+@producto.route('/getAll', methods=['GET'])
+@login_required('Gerente')
 def obtener_todos():
     try:
         productos = Producto.query.all()
         productos_lista = [
             {
-                "Producto_ID": producto.id,
-                "Nombre": producto.nombre,
-                "Descripcion": producto.descripcion,
-                "Precio": producto.precio,
-                "Stock": producto.stock,
-                "FechaIngreso": producto.fecha_ingreso.strftime("%Y-%m-%d %H:%M:%S")
+                "Producto_ID": producto.Producto_ID,
+                "SubCategoria": producto.subcategoria.Nombre,
+                "CodigoBarras": producto.CodigoBarras,
+                "Descripcion": producto.Descripcion,
+                "Precio": producto.Precio,
+                "Stock": producto.Stock,
+                "FechaIngreso": producto.FechaIngreso.isoformat()
             }
             for producto in productos
         ]
@@ -25,8 +26,8 @@ def obtener_todos():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
-@producto.route('/api/producto/get/<int:id>', methods=['GET'])
-@login_required
+@producto.route('/get/<int:id>', methods=['GET'])
+@login_required('Gerente')
 def obtener_producto(id):
     try:
         producto = Producto.query.get(id)
@@ -45,8 +46,8 @@ def obtener_producto(id):
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
-@producto.route('/api/producto/register', methods=['POST'])
-@login_required
+@producto.route('/register', methods=['POST'])
+@login_required('Gerente')
 def registrar_producto():
     try:
         data = request.get_json()
@@ -62,8 +63,8 @@ def registrar_producto():
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
-@producto.route('/api/producto/update/<int:id>', methods=['PUT'])
-@login_required
+@producto.route('/update/<int:id>', methods=['PUT'])
+@login_required('Gerente')
 def actualizar_producto(id):
     try:
         data = request.get_json()
@@ -81,8 +82,8 @@ def actualizar_producto(id):
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
-@producto.route('/api/producto/delete/<int:id>', methods=['DELETE'])
-@login_required
+@producto.route('/delete/<int:id>', methods=['DELETE'])
+@login_required('Gerente')
 def eliminar_producto(id):
     try:
         producto = Producto.query.get(id)

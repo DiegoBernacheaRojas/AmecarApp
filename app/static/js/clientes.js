@@ -1,15 +1,12 @@
-$(document).ready(function () {
-    let clienteId = null;  // Variable global para almacenar el ID del cliente que se editará/eliminará
-
-
-    // Inicialización de la tabla
+// Función para inicializar la tabla
+function inicializarTabla() {
     $('#tablaClientes').DataTable({
         ajax: {
-            url: '/api/cliente/getAll', // Endpoint que devuelve los datos en formato JSON
-            dataSrc: 'data' // Ruta donde están los datos dentro del JSON de respuesta
+            url: '/api/cliente/getAll',
+            dataSrc: 'data'
         },
         columns: [
-            { data: 'Cliente_ID' },   // Coincide con la clave en el JSON
+            { data: 'Cliente_ID' },
             { data: 'Nombre' },
             { data: 'TipoCliente' },
             { data: 'TipoDoc_ID' },
@@ -31,8 +28,6 @@ $(document).ready(function () {
                 }
             }
         ],
-        // dom: 'Bfrtip',  // Botones (copy, csv, excel, etc.)
-        // buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
         language: {
             decimal: ",",
             thousands: ".",
@@ -53,205 +48,142 @@ $(document).ready(function () {
                 sortDescending: ": activar para ordenar la columna de manera descendente"
             }
         },
-        responsive: true, // Activar diseño responsivo
-        paging: true, // Habilitar paginación (es la configuración predeterminada)
-        pageLength: 10, // Número de filas por página
-        lengthChange: true, // Permitir cambiar el número de filas por página
-        ordering: true, // Habilitar ordenación por columnas
-        searching: true, // Habilitar búsqueda
-        autoWidth: false, // Evitar ajuste automático del ancho
+        responsive: true,
+        paging: true,
+        lengthChange: true,
+        ordering: true,
+        searching: true,
+        autoWidth: false,
+        scrollX: true,
     });
+}
 
-    // URL de las APIs para obtener los datos
-    const apiTipoDocumento = "/api/tipodocumento/getAll";
-    const apiDistrito = "/api/distrito/getAll";
-    const apiSexo = "/api/sexo/getAll";
+// Función para llenar un select con datos de un API
+async function llenarSelect(apiUrl, selectId, valueField, textField) {
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`Error al obtener datos: ${response.statusText}`);
 
-    // Función para llenar el select de Tipo de Documento
-    async function llenarTipoDocumento() {
-        try {
-            const response = await fetch(apiTipoDocumento);
-            if (!response.ok) {
-                throw new Error(`Error al obtener datos: ${response.statusText}`);
-            }
+        const data = await response.json();
+        const selectElement = document.getElementById(selectId);
 
-            const data = await response.json();
-            const selectElement = document.getElementById("tipoDocumento");
-
-            if (data.success && Array.isArray(data.data)) {
-                data.data.forEach(item => {
-                    const option = document.createElement("option");
-                    option.value = item.TipoDoc_ID; // Clave específica para este caso
-                    option.textContent = item.Nombre; // Nombre para mostrar
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error("No se obtuvieron datos válidos para Tipo de Documento.");
-            }
-        } catch (error) {
-            console.error("Error al llenar Tipo de Documento:", error);
+        if (data.success && Array.isArray(data.data)) {
+            data.data.forEach(item => {
+                const option = document.createElement("option");
+                option.value = item[valueField];
+                option.textContent = item[textField];
+                selectElement.appendChild(option);
+            });
+        } else {
+            console.error(`No se obtuvieron datos válidos para ${selectId}.`);
         }
+    } catch (error) {
+        console.error(`Error al llenar ${selectId}:`, error);
     }
+}
 
-    // Función para llenar el select de Distrito
-    async function llenarDistrito() {
-        try {
-            const response = await fetch(apiDistrito);
-            if (!response.ok) {
-                throw new Error(`Error al obtener datos: ${response.statusText}`);
-            }
+// Función para limpiar el modal
+function limpiarModal() {
+    $('#nombreCliente').val('');
+    $('#fechaNacimiento').val('');
+    $('#numeroDocumento').val('');
+    $('#direccionCliente').val('');
+    $('#telefonoCliente').val('');
+    $('#correoCliente').val('');
+}
 
-            const data = await response.json();
-            const selectElement = document.getElementById("distritonCliente");
+// Función principal para manejar eventos y lógica
+async function main() {
+    let clienteId = null;
 
-            if (data.success && Array.isArray(data.data)) {
-                data.data.forEach(item => {
-                    const option = document.createElement("option");
-                    option.value = item.Codigo; // Clave específica para este caso
-                    option.textContent = item.Nombre; // Nombre para mostrar
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error("No se obtuvieron datos válidos para Distrito.");
-            }
-        } catch (error) {
-            console.error("Error al llenar Distrito:", error);
-        }
-    }
+    // Inicializar la tabla
+    inicializarTabla();
 
-    // Función para llenar el select de Sexo
-    async function llenarSexo() {
-        try {
-            const response = await fetch(apiSexo);
-            if (!response.ok) {
-                throw new Error(`Error al obtener datos: ${response.statusText}`);
-            }
+    // Llenar selects
+    await llenarSelect("/api/tipodocumento/getAll", "tipoDocumento", "TipoDoc_ID", "Nombre");
+    await llenarSelect("/api/distrito/getAll", "distritonCliente", "Distrito_ID", "Nombre");
+    await llenarSelect("/api/sexo/getAll", "sexoCliente", "Sexo_ID", "Nombre");
 
-            const data = await response.json();
-            const selectElement = document.getElementById("sexoCliente");
-
-            if (data.success && Array.isArray(data.data)) {
-                data.data.forEach(item => {
-                    const option = document.createElement("option");
-                    option.value = item.Sexo_ID; // Clave específica para este caso
-                    option.textContent = item.Nombre; // Nombre para mostrar
-                    selectElement.appendChild(option);
-                });
-            } else {
-                console.error("No se obtuvieron datos válidos para Sexo.");
-            }
-        } catch (error) {
-            console.error("Error al llenar Sexo:", error);
-        }
-    }
-
-    // Llamar a cada función para llenar los selects correspondientes
-    llenarTipoDocumento();
-    llenarDistrito();
-    llenarSexo();
-
-    // limpiar modal
-    async function modalClear() {
-        $('#nombreCliente').val(''); 
-        $('#fechaNacimiento').val('');
-        $('#numeroDocumento').val('');
-        $('#direccionCliente').val('');
-        $('#telefonoCliente').val('');
-        $('#correoCliente').val('');
-    }
-    // abrir modal registro
+    // Evento para abrir el modal de registro
     $(document).on('click', '.nuevoBtn', function () {
+        limpiarModal();
         $('#clienteModalLabel').text('Registrar Cliente');
         $('#guardarCliente').text('Registrar');
         $('#clienteModal').modal('show');
     });
 
-    // abrir modal registro
-    $(document).on('click', '.xBtn', function () {
-        modalClear();
-
-        $('#clienteModal').modal('hide');
-        $('#confirmarEliminarModal').modal('hide');
-    });
-
-    //boton cerrar modal
+    // Evento para cerrar modales
     $(document).on('click', '.cerrarBtn', function () {
-
-        modalClear();
-
+        limpiarModal();
         $('#clienteModal').modal('hide');
         $('#confirmarEliminarModal').modal('hide');
+        clienteId = null;
     });
 
-    // Acción para editar cliente    
-    $(document).on('click', '.editarBtn', function () {
+    // Evento para editar cliente
+    $(document).on('click', '.editarBtn', async function () {
         clienteId = $(this).data('id');
         $('#clienteModalLabel').text('Editar Cliente');
         $('#guardarCliente').text('Actualizar');
-        $.ajax({
-            url: `/api/cliente/getId/${clienteId}`,
-            type: 'GET',
-            success: function (response) {
-                if (response.success) {
-                    // Rellenar los inputs del formulario con los datos obtenidos
-                    const cliente = response.data;
-    
-                    $('#nombreCliente').val(cliente.Nombre);
-                    $('#tipoCliente').val(cliente.TipoCliente);
-                    $('#tipoDocumento').val(cliente.TipoDoc_ID);
-                    $('#numeroDocumento').val(cliente.NumDoc);
-                    $('#sexoCliente').val(cliente.Sexo);
-                    $('#direccionCliente').val(cliente.Direccion);
-                    $('#distritonCliente').val(cliente.Distrito);
-                    $('#telefonoCliente').val(cliente.Telefono);
-                    $('#correoCliente').val(cliente.Correo);
-                    $('#fechaNacimiento').val(cliente.FechaNacimiento);
-    
-                    // Mostrar el modal
-                    $('#clienteModal').modal('show');
-                } else {
-                    alert("Error al obtener los datos del cliente: " + response.message);
-                }
-            },
-            error: function (xhr, status, error) {
-                alert("Error en la solicitud: " + error);
-            }
-        });
 
-        // Mostrar el modal
-        $('#clienteModal').modal('show');
+        try {
+            const response = await fetch(`/api/cliente/getId/${clienteId}`);
+            if (!response.ok) throw new Error(`Error al obtener cliente: ${response.statusText}`);
+
+            const data = await response.json();
+            if (data.success) {
+                const cliente = data.data;
+                $('#nombreCliente').val(cliente.Nombre);
+                $('#tipoCliente').val(cliente.TipoCliente);
+                $('#tipoDocumento').val(cliente.TipoDoc_ID);
+                $('#numeroDocumento').val(cliente.NumDoc);
+                $('#sexoCliente').val(cliente.Sexo);
+                $('#direccionCliente').val(cliente.Direccion);
+                $('#distritonCliente').val(cliente.Distrito);
+                $('#telefonoCliente').val(cliente.Telefono);
+                $('#correoCliente').val(cliente.Correo);
+                $('#fechaNacimiento').val(cliente.FechaNacimiento);
+
+                $('#clienteModal').modal('show');
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            console.error("Error al editar cliente:", error);
+        }
     });
 
-    // Acción para eliminar cliente
+    // Evento para eliminar cliente
     $(document).on('click', '.eliminarBtn', function () {
         clienteId = $(this).data('id');
-        // Mostrar modal de confirmación
         $('#confirmarEliminarModal').modal('show');
     });
 
     // Confirmar eliminación
-    $('#confirmarEliminar').click(function () {
-        // Llamar a una API para eliminar el cliente
-        // Por ejemplo:
-        $.ajax({
-            url: '/api/cliente/desactivar/' + clienteId,
-            type: 'POST',
-            success: function (response) {
-                // Refrescar la tabla después de eliminar
+    $('#confirmarEliminar').click(async function () {
+        try {
+            const response = await fetch(`/api/cliente/desactivar/${clienteId}`, { method: 'POST' });
+            if (response.ok) {
                 $('#tablaClientes').DataTable().ajax.reload();
                 $('#confirmarEliminarModal').modal('hide');
+                clienteId = null;
+            } else {
+                alert("Error al eliminar el cliente.");
+                clienteId = null;
             }
-        });
+        } catch (error) {
+            console.error("Error al eliminar cliente:", error);
+        }
     });
 
-    $('#guardarCliente').click(function () {
-        // Obtener los datos del formulario y adaptarlos al formato requerido
-        let clienteData = {
-            Sexo_ID: $('#sexoCliente').val(), // ID del sexo
-            Distrito_Codigo: $('#distritonCliente').val(), // Código del distrito
+    // Guardar cliente
+    $('#guardarCliente').click(async function () {
+        const clienteData = {
+            Sexo_ID: $('#sexoCliente').val(),
+            Distrito_Codigo: $('#distritonCliente').val(),
             Nombre: $('#nombreCliente').val(),
             TipoCliente: $('#tipoCliente').val(),
-            TipoDoc_ID: $('#tipoDocumento').val(), // ID del tipo de documento
+            TipoDoc_ID: $('#tipoDocumento').val(),
             NumDoc: $('#numeroDocumento').val(),
             Telefono: $('#telefonoCliente').val(),
             Correo: $('#correoCliente').val(),
@@ -259,55 +191,36 @@ $(document).ready(function () {
             FechaNacimiento: $('#fechaNacimiento').val()
         };
 
-        // Validación de datos básicos antes de enviar
         if (!clienteData.Nombre || !clienteData.NumDoc || !clienteData.Telefono || !clienteData.Correo) {
             alert("Por favor completa todos los campos obligatorios.");
             return;
         }
-    
-        // Diferenciar entre agregar y editar un cliente
-        if (clienteId) {
-            // Editar cliente
-            $.ajax({
-                url: '/api/cliente/update/' + clienteId,
-                type: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(clienteData),
-                success: function (response) {
-                    if (response.success) {
-                        $('#tablaClientes').DataTable().ajax.reload();
-                        $('#clienteModal').modal('hide');
-                        //alert("Cliente editado con éxito.");
-                    } else {
-                        alert("Error al editar el cliente: " + response.message);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    alert("Error en la solicitud: " + error);
-                }
+
+        const method = clienteId ? 'PUT' : 'POST';
+        const url = clienteId ? `/api/cliente/update/${clienteId}` : '/api/cliente/register';
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(clienteData)
             });
-        } else {
-            // Agregar nuevo cliente
-            $.ajax({
-                url: '/api/cliente/register',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(clienteData),
-                success: function (response) {
-                    if (response.success) {
-                        $('#tablaClientes').DataTable().ajax.reload();
-                        modalClear();
-                        $('#clienteModal').modal('hide');
-                        //alert("Cliente agregado con éxito.");
-                    } else {
-                        alert("Error al agregar el cliente: " + response.message);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    alert("Error en la solicitud: " + error);
-                }
-            });
+
+            const data = await response.json();
+            if (data.success) {
+                $('#tablaClientes').DataTable().ajax.reload();
+                limpiarModal();
+                $('#clienteModal').modal('hide');
+                clienteId = null;
+            } else {
+                alert(`Error: ${data.message}`);
+                clienteId = null;
+            }
+        } catch (error) {
+            console.error("Error al guardar cliente:", error);
         }
     });
-    
-});
+}
+
+// Ejecutar la función principal cuando el documento esté listo
+$(document).ready(main);

@@ -6,7 +6,7 @@ from ..utils import login_required
 sexo = Blueprint('sexo', __name__)
 
 @sexo.route('/getAll', methods=['GET'])
-@login_required
+@login_required('Gerente')
 def getAll():
     try:
         # Obtener todos los clientes
