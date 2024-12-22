@@ -1,194 +1,148 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const inputCodigoBarras = document.getElementById("codigo_barras");
-    const tablaVenta = document.getElementById("tablaVenta").querySelector("tbody");
-    const totalVentaDisplay = document.getElementById("totalVenta"); // Contenedor del total general
-    const mensajeDiv = document.createElement("div");
-    inputCodigoBarras.parentNode.appendChild(mensajeDiv); // Mostrar mensajes cerca del input
-
-    let buscarTimeout;
-
-    inputCodigoBarras.addEventListener("input", () => {
-        clearTimeout(buscarTimeout);
-        const codigoBarras = inputCodigoBarras.value.trim();
-        if (!codigoBarras) return;
-
-        buscarTimeout = setTimeout(() => buscarYAgregarProducto(codigoBarras), 300);
+// Función para inicializar la tabla de ventas
+function inicializarTablaVentas() {
+    $('#tablaVentas').DataTable({
+        ajax: {
+            url: '/api/venta/getAll', // URL de API para obtener ventas
+            dataSrc: 'data'
+        },
+        columns: [
+            { data: 'Venta_ID' },
+            { data: 'Cliente_Nombre' },
+            { data: 'Empleado_Nombre' },
+            { data: 'Total' },
+            { data: 'FechaVenta' },
+            {
+                data: null,
+                render: function (data, type, row) {
+                    return `
+                        <button class="btn btn-info btn-sm detallesBtn" data-id="${row.Venta_ID}">Detalles</button>
+                        <button class="btn btn-danger btn-sm eliminarBtn" data-id="${row.Venta_ID}">Eliminar</button>
+                    `;
+                }
+            }
+        ],
+        language: {
+            decimal: ",",
+            thousands: ".",
+            lengthMenu: "Mostrar _MENU_ registros por página",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+            infoEmpty: "Mostrando 0 a 0 de 0 registros",
+            infoFiltered: "(filtrado de _MAX_ registros en total)",
+            search: "Buscar:",
+            zeroRecords: "No se encontraron registros coincidentes",
+            paginate: {
+                first: "Primero",
+                previous: "Anterior",
+                next: "Siguiente",
+                last: "Último"
+            },
+            aria: {
+                sortAscending: ": activar para ordenar la columna de manera ascendente",
+                sortDescending: ": activar para ordenar la columna de manera descendente"
+            }
+        },
+        responsive: true,
+        paging: true,
+        lengthChange: true,
+        ordering: true,
+        searching: true,
+        autoWidth: false,
+        scrollX: true,
     });
-
-    async function buscarYAgregarProducto(codigoBarras) {
-        try {
-            // Verificar si el producto ya está en la tabla
-            const filaExistente = Array.from(tablaVenta.querySelectorAll("tr")).find((row) => {
-                return row.querySelector("td")?.textContent === codigoBarras;
-            });
-
-            if (filaExistente) {
-                const cantidadInput = filaExistente.querySelector(".cantidad-input");
-                cantidadInput.value = parseInt(cantidadInput.value) + 1;
-                actualizarTotal({ target: cantidadInput }); // Actualiza el total individual
-                calcularTotalGeneral(); // Recalcula el total general de la venta
-                mostrarMensaje("Cantidad actualizada.", "success");
-                inputCodigoBarras.value = "";
-                return;
-            }
-
-            // Petición al servidor para buscar el producto
-            const response = await fetch("/api/venta/buscar_producto", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ codigo_barras: codigoBarras }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                agregarProductoATabla(data);
-                mostrarMensaje("Producto agregado correctamente.", "success");
-                inputCodigoBarras.value = "";
-                calcularTotalGeneral();
-            } else {
-                mostrarMensaje(data.error || "Error al buscar el producto.", "error");
-            }
-        } catch (error) {
-            mostrarMensaje("Error al comunicarse con el servidor.", "error");
-            console.error(error);
-        }
-    }
-
-    function agregarProductoATabla(producto) {
-        const fila = document.createElement("tr");
-    
-        // Crear columnas para cada campo de producto
-        const codigoColumna = document.createElement("td");
-        codigoColumna.textContent = producto.CodigoBarras;
-    
-        const descripcionColumna = document.createElement("td");
-        descripcionColumna.textContent = producto.Descripcion;
-    
-        const precioColumna = document.createElement("td");
-        precioColumna.textContent = parseFloat(producto.Precio).toFixed(2);
-    
-        const cantidadColumna = document.createElement("td");
-        const cantidadInput = document.createElement("input");
-        cantidadInput.type = "number";
-        cantidadInput.value = producto.Cantidad || 1; // Valor predeterminado de cantidad
-        cantidadInput.min = 1;
-        cantidadInput.className = "cantidad-input";
-        cantidadInput.dataset.precio = parseFloat(producto.Precio);
-        cantidadColumna.appendChild(cantidadInput);
-    
-        const totalColumna = document.createElement("td");
-        totalColumna.className = "total";
-        const totalInicial = (producto.Cantidad || 1) * parseFloat(producto.Precio);
-        totalColumna.textContent = totalInicial.toFixed(2);
-    
-        // Agregar las columnas a la fila
-        fila.appendChild(codigoColumna);
-        fila.appendChild(descripcionColumna);
-        fila.appendChild(precioColumna);
-        fila.appendChild(cantidadColumna);
-        fila.appendChild(totalColumna);
-    
-        // Agregar la fila a la tabla
-        tablaVenta.appendChild(fila);
-    
-        // Escuchar cambios en la cantidad para recalcular el total y el total general
-        cantidadInput.addEventListener("input", (event) => {
-            actualizarTotal(event);
-            calcularTotalGeneral();
-        });
-    
-        // Desplazarse automáticamente al final de la tabla
-        scrollToBottom();
-    }
-
-
-    function mostrarMensaje(mensaje, tipo) {
-        mensajeDiv.textContent = mensaje;
-        mensajeDiv.style.color = tipo === "success" ? "green" : "red";
-        mensajeDiv.style.marginTop = "10px";
-
-        // Ocultar mensaje después de 3 segundos
-        setTimeout(() => {
-            mensajeDiv.textContent = "";
-        }, 3000);
-    }
-
-    function actualizarTotal(event) {
-        const input = event.target;
-        const precio = parseFloat(input.dataset.precio);
-        const cantidad = parseInt(input.value) || 0;
-        const totalCell = input.closest("tr").querySelector(".total");
-
-        if (cantidad > 0) {
-            const total = precio * cantidad;
-            totalCell.textContent = total.toFixed(2);
-        } else {
-            totalCell.textContent = "0.00";
-        }
-    }
-
-    function calcularTotalGeneral() {
-        const total = Array.from(tablaVenta.querySelectorAll(".total"))
-            .reduce((sum, cell) => sum + parseFloat(cell.textContent), 0);
-    
-        totalVentaDisplay.textContent = `S/. ${total.toFixed(2)}`;
-    }
-});
-
-function scrollToBottom() {
-    var tableBody = document.querySelector("#tablaVenta tbody");
-    tableBody.scrollTop = tableBody.scrollHeight; // Mueve el scroll hasta el fondo
 }
 
-// Ejecutar cuando el contenido de la tabla se actualiza (se añaden productos, por ejemplo)
-document.addEventListener("DOMContentLoaded", function() {
-    // Llamamos a la función una vez que la página se haya cargado
-    scrollToBottom();
-});
-document.addEventListener('DOMContentLoaded', () => {
-    const metodoPagoSelect = document.getElementById('metodo_pago');
-    const detallesPagoDiv = document.getElementById('detallesPago');
-    const confirmarPagoButton = document.getElementById('confirmarPago');
+// Función para limpiar campos del modal de detalles
+function limpiarModalDetalles() {
+    $('#clienteVenta').val('');
+    $('#empleadoVenta').val('');
+    $('#fechaVenta').val('');
+    $('#tablaDetalles tbody').empty();
+    $('#totalVenta').val('');
+}
 
-    metodoPagoSelect.addEventListener('change', function() {
-        const metodo = metodoPagoSelect.value;
-        detallesPagoDiv.innerHTML = ''; // Limpiar contenido previo
+// Función para mostrar los detalles de una venta
+async function mostrarDetallesVenta(ventaId) {
+    try {
+        const response = await fetch(`/api/venta/getId/${ventaId}`); // URL de API para obtener detalles de venta
+        if (!response.ok) throw new Error(`Error al obtener detalles: ${response.statusText}`);
 
-        if (metodo === 'tarjeta') {
-            detallesPagoDiv.innerHTML = `
-                <label for="numero_transaccion">Número de Transacción:</label>
-                <input type="text" id="numero_transaccion" name="numero_transaccion" placeholder="Ingrese el número de transacción" required>
-            `;
-        } else if (metodo === 'efectivo') {
-            detallesPagoDiv.innerHTML = `
-                <label for="monto_entregado">Monto Entregado:</label>
-                <input type="number" id="monto_entregado" name="monto_entregado" placeholder="Ingrese el monto entregado" required>
-                <label for="cambio">Cambio:</label>
-                <input type="text" id="cambio" name="cambio" placeholder="El cambio aparecerá aquí" readonly>
-            `;
-        } else if (metodo === 'yape') {
-                detallesPagoDiv.innerHTML = `
-                    <label for="numero_telefono">Número de Teléfono:</label>
-                    <input type="text" id="numero_telefono" name="numero_telefono" placeholder="Ingrese el número de teléfono" required>
-            `;
+        const data = await response.json();
+        if (data.success) {
+            const venta = data.data;
+            $('#clienteVenta').val(venta.Cliente_Nombre);
+            $('#empleadoVenta').val(venta.Empleado_Nombre);
+            $('#fechaVenta').val(venta.FechaVenta);
 
-        } else if (metodo === 'plin') {
-            detallesPagoDiv.innerHTML = `
-                <label for="numero_telefono">Número de Teléfono:</label>
-                <input type="text" id="numero_telefono" name="numero_telefono" placeholder="Ingrese el número de teléfono" required>
-            `;
+            // Agregar productos a la tabla de detalles
+            const tbody = $('#tablaDetalles tbody');
+            tbody.empty();
+            venta.Detalles.forEach(detalle => {
+                tbody.append(`
+                    <tr>
+                        <td>${detalle.Producto_Descripcion}</td>
+                        <td>${detalle.PrecioUnitario}</td>
+                        <td>${detalle.Cantidad}</td>
+                        <td>${detalle.SubTotal}</td>
+                    </tr>
+                `);
+            });
+
+            $('#totalVenta').val(venta.Total);
+            $('#Modal').modal('show');
+        } else {
+            alert(`Error: ${data.message}`);
         }
+    } catch (error) {
+        console.error("Error al mostrar detalles:", error);
+    }
+}
 
-        // Mostrar el div si hay contenido
-        detallesPagoDiv.style.display = detallesPagoDiv.innerHTML ? 'block' : 'none';
+// Función para confirmar eliminación de una venta
+async function eliminarVenta(ventaId) {
+    try {
+        const response = await fetch(`/api/venta/desactivar/${ventaId}`, { method: 'POST' }); // URL de API para eliminar venta
+        if (response.ok) {
+            $('#tablaVentas').DataTable().ajax.reload();
+            $('#confirmarEliminarModal').modal('hide');
+        } else {
+            alert("Error al eliminar la venta.");
+        }
+    } catch (error) {
+        console.error("Error al eliminar venta:", error);
+    }
+}
+
+// Función principal para manejar eventos y lógica
+async function main() {
+    let ventaId = null;
+
+    // Inicializar la tabla
+    inicializarTablaVentas();
+
+    // Evento para abrir detalles de venta
+    $(document).on('click', '.detallesBtn', function () {
+        ventaId = $(this).data('id');
+        limpiarModalDetalles();
+        mostrarDetallesVenta(ventaId);
     });
 
-    confirmarPagoButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        // Implementar la lógica de procesamiento del pago aquí
-        alert('Pago procesado exitosamente.');
+    // Evento para abrir el modal de confirmación de eliminación
+    $(document).on('click', '.eliminarBtn', function () {
+        ventaId = $(this).data('id');
+        $('#confirmarEliminarModal').modal('show');
     });
-});
+
+    // Confirmar eliminación
+    $('#confirmarEliminar').click(function () {
+        eliminarVenta(ventaId);
+    });
+
+    // Evento para cerrar modales
+    $(document).on('click', '.cerrarBtn', function () {
+        $('#Modal').modal('hide');
+        $('#confirmarEliminarModal').modal('hide');
+    });
+}
+
+// Ejecutar la función principal cuando el documento esté listo
+$(document).ready(main);

@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy import text
 
 class Categoria(db.Model):
     __tablename__ = 'Categoria'
@@ -32,8 +33,9 @@ class Producto(db.Model):
     Stock = db.Column(db.Integer, nullable=False)
     FechaIngreso = db.Column(db.Date, nullable=False)
     Estado = db.Column(db.Boolean, nullable=False)
-    # No es necesario una relación inversa, ya que solo se tiene un solo nivel
-    # No se agrega backref en este caso
+
+    # Relación con DetalleVenta
+    detalles = db.relationship('DetalleVenta', backref='producto', lazy=True)
 
 
 class Sexo(db.Model):
@@ -135,6 +137,7 @@ class Venta(db.Model):
     Cliente_ID = db.Column(db.Integer, db.ForeignKey('Cliente.Cliente_ID'), nullable=False)
     Empleado_ID = db.Column(db.Integer, db.ForeignKey('Empleado.Empleado_ID'), nullable=False)
     FechaVenta = db.Column(db.Date, nullable=False)
+    Total = db.Column(db.Numeric(10, 2), nullable=False, server_default=text("0.00"))
     Estado = db.Column(db.Boolean, nullable=False)
 
     # Relación con DetalleVenta
@@ -149,4 +152,5 @@ class DetalleVenta(db.Model):
     Producto_ID = db.Column(db.Integer, db.ForeignKey('Producto.Producto_ID'), nullable=False)
     Cantidad = db.Column(db.Integer, nullable=False)
     PrecioUnitario = db.Column(db.Numeric(10, 2), nullable=False)
+    SubTotal = db.Column(db.Numeric(10, 2), nullable=False, server_default=text("0.00"))
     Estado = db.Column(db.Boolean, nullable=False)

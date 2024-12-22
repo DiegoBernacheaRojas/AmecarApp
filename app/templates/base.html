@@ -40,14 +40,27 @@
         <hr>
         <nav class="sidebar-nav">
             <ul>
-                {% if 'ventas' in permisos %}
-                <li><a href="/ventas" id="ventas-link">Ventas</a></li>
-                {% endif %}
-                {% if 'productos' in permisos %}
-                <li><a href="/productos" id="productos-link">Productos</a></li>
-                {% endif %}
-                {% if 'clientes' in permisos %}
-                <li><a href="/clientes" id="clientes-link">Clientes</a></li>
+                <li>
+                    {% if 'ventas' in permisos or 'productos' in permisos or 'clientes' in permisos or 'empleados' in permisos %}
+                    <a class="dropdown-button" id="dropdown-admin">Administrar</a>
+                    <ul class="dropdown-content" id="dropdown-content">
+                        {% if 'ventas' in permisos %}
+                        <li><a href="/ventas" id="ventas-link">Ventas</a></li>
+                        {% endif %}
+                        {% if 'productos' in permisos %}
+                        <li><a href="/productos" id="productos-link">Productos</a></li>
+                        {% endif %}
+                        {% if 'clientes' in permisos %}
+                        <li><a href="/clientes" id="clientes-link">Clientes</a></li>
+                        {% endif %}
+                        {% if 'empleados' in permisos %}
+                        <li><a href="/empleados" id="empleados-link">Empleados</a></li>
+                        {% endif %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% if 'realizarVenta' in permisos %}
+                <li><a href="/realizarVenta" id="realizarVenta-link">Realizar Venta</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -68,7 +81,8 @@
                 <!-- El contenido por defecto se puede dejar vacío o con algo básico -->
         {% endblock %}
     </div>
-
+    <br>
+    <br>
     <!-- Footer -->
     <footer class="footer">
         Pie de página

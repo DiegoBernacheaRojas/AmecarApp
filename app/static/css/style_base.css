@@ -170,3 +170,44 @@ body {
     left: 0;
     width: 100%;
 }
+/* Menú desplegable con animación */
+.dropdown-content {
+    display: block; /* Cambiar a bloque para usar animación */
+    max-height: 0; /* Altura inicial cerrada */
+    overflow: hidden; /* Esconde el contenido mientras está cerrado */
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background-color: #00ae43;
+    border: 1px solid #00ae43;
+    transition: max-height 0.3s ease-out; /* Animación de altura */
+}
+
+/* Opciones dentro del menú */
+.dropdown-content li {
+    padding: 8px 16px;
+    border-bottom: 1px solid #00ae43;
+}
+
+.dropdown-content li a {
+    text-decoration: none;
+    color: #00ae43;
+    display: block;
+}
+
+.dropdown-content li a:hover {
+    background-color: #00ae43;
+}
+
+/* Cuando el menú está activo */
+.dropdown-content.active {
+    max-height: 300px; /* Ajusta según la altura total de tus elementos */
+}
+
+.dropdown-button {
+    cursor: pointer; /* Cambia el puntero a una mano como los enlaces */
+    text-decoration: none; /* Elimina subrayado si lo tuviera */
+    font-size: 16px; /* Ajusta el tamaño de la fuente */
+    display: block; /* Para alinearlo como un elemento de lista */
+    padding: 10px; /* Espaciado */
+}

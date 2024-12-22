@@ -3,7 +3,7 @@
 {% block title %}Productos{% endblock %}
 
 {% block content %}
-<div class="content-title">Gestión de Productos</div>
+<div class="content-title">Productos</div>
 
 <div class="content">
     <button class="btn btn-success nuevoBtn">Nuevo Producto</button>
@@ -58,8 +58,8 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="productoModalLabel">Agregar/Editar Producto</h5>
-                <button type="button" class="btn btn-link p-0 xBtn" style="text-decoration: none;">
+                <h5 class="modal-title" id="productoModalLabel"></h5>
+                <button type="button" class="btn btn-link p-0 cerrarBtn" style="text-decoration: none;">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -69,8 +69,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="subcategoriaProducto">Subcategoría</label>
-                                <select class="form-control" id="subcategoriaProducto" required>
-                                    <!-- Opciones cargadas dinámicamente -->
+                                <select class="form-control" id="subcategoriaProducto">
                                 </select>
                             </div>
                             <br>
@@ -96,11 +95,8 @@
                             </div>
                             <br>
                             <div class="form-group">
-                                <label for="estadoProducto">Estado</label>
-                                <select class="form-control" id="estadoProducto">
-                                    <option value="1">Activo</option>
-                                    <option value="0">Inactivo</option>
-                                </select>
+                                <label for="codigoBarrasProducto">Codigo de Barras</label>
+                                <input type="text" class="form-control" id="codigoBarrasProducto" required>
                             </div>
                         </div>
                     </div>
@@ -118,8 +114,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmacion de Eliminación</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmación de Eliminación</h5>
+                <button type="button" class="btn btn-link p-0 cerrarBtn" style="text-decoration: none; " >
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -127,7 +123,7 @@
                 ¿Estás seguro de que deseas eliminar este producto?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary cerrarBtn" >Cancelar</button>
                 <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
             </div>
         </div>
