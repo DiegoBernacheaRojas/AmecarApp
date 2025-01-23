@@ -1,79 +1,27 @@
 from flask import Blueprint, jsonify, request
 from app import db
-from ..models import Venta,Producto
+from ..models import Venta, DetalleVenta
 from ..utils import login_required
 
-
 venta = Blueprint('venta', __name__)
-@venta.route('/buscar_producto', methods=['POST'])
-@login_required('Gerente','Empleado')
-def buscar_producto():
-    """
-    Ruta para buscar un producto por código de barras.
-    """
-    # Obtener el código de barras enviado en el cuerpo de la solicitud
-    data = request.get_json()
-    codigo_barras = data.get('codigo_barras')
 
-    if not codigo_barras:
-        return jsonify({"error": "Código de barras no proporcionado"}), 400
-
-    # Buscar el producto en la base de datos
-    producto = Producto.query.filter_by(CodigoBarras=codigo_barras).first()
-
-    if not producto:
-        return jsonify({"error": "Producto no encontrado"}), 404
-
-    # Crear un diccionario con los datos del producto
-    producto_data = {
-        "Producto_ID": producto.Producto_ID,
-        "CodigoBarras": producto.CodigoBarras,
-        "Descripcion": producto.Descripcion,
-        "Precio": float(producto.Precio),
-        "Stock": producto.Stock,
-        "FechaIngreso": producto.FechaIngreso.strftime('%Y-%m-%d'),
-        "Estado": producto.Estado,
-        "Cantidad": 1,  # Valor inicial por defecto
-        "Total": float(producto.Precio)  # Cantidad * Precio (inicialmente 1)
-    }
-
-    return jsonify(producto_data), 200
-
-# Ruta para calcular el total
-@venta.route('/calcular_total', methods=['POST'])
-@login_required('Gerente','Empleado')
-def calcular_total():
-    # Obtener datos enviados en la solicitud
-    data = request.get_json()
-
-    if not data or "codigo_barras" not in data or "cantidad" not in data:
-        return jsonify({"error": "Debe proporcionar código de barras y cantidad"}), 400
-
-    codigo_barras = data['codigo_barras']
-    cantidad = data['cantidad']
-
-    if not isinstance(cantidad, (int, float)) or cantidad <= 0:
-        return jsonify({"error": "La cantidad debe ser un número mayor a 0"}), 400
-
+# Obtener todas las ventas activas
+@venta.route('/getAll', methods=['GET'])
+@login_required('Gerente')
+def getAll():
     try:
-        # Consulta en la base de datos utilizando el modelo Producto
-        producto = Producto.query.filter_by(CodigoBarra=codigo_barras).first()
-
-        if not producto:
-            return jsonify({"error": "Producto no encontrado"}), 404
-
-        # Calcular el total
-        total = producto.PrecioUnitario * cantidad
-
-        # Devolver la información del producto con el total calculado
-        return jsonify({
-            "CodigoBarra": producto.CodigoBarra,
-            "Descripcion": producto.Descripcion,
-            "PrecioUnitario": producto.PrecioUnitario,
-            "Cantidad": cantidad,
-            "Total": total
-        })
-
+        ventas = Venta.query.filter_by(Estado=1).all()  # Filtra solo ventas activas
+        result = [
+            {
+                "Venta_ID": venta.Venta_ID,
+                "Cliente_Nombre": venta.cliente.Nombre,
+                "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                "FechaVenta": venta.FechaVenta.isoformat(),
+                "Total": venta.Total,
+                "Estado": venta.Estado
+            } for venta in ventas
+        ]
+        return jsonify({"success": True, "data": result}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 @venta.route('/guardar_documento', methods=['POST'])
@@ -121,3 +69,70 @@ def guardar_documento():
             return jsonify({'message': 'RUC guardado correctamente'})
 
     return jsonify({'message': 'Tipo de documento no válido'})
+
+
+# Obtener una venta por ID
+@venta.route('/getId/<int:Venta_ID>', methods=['GET'])
+@login_required('Gerente')
+def getId(Venta_ID):
+    try:
+        # Obtener la venta principal
+        venta = Venta.query.get(Venta_ID)
+        if not venta:
+            return jsonify({"success": False, "message": "Venta no encontrada"}), 404
+        
+        # Obtener los detalles relacionados con la venta
+        detalles = DetalleVenta.query.filter_by(Venta_ID=Venta_ID).all()
+        detalles_result = [
+            {
+                "DetalleVenta_ID": detalle.DetalleVenta_ID,
+                "Producto_Descripcion": detalle.producto.Descripcion,
+                "Cantidad": detalle.Cantidad,
+                "PrecioUnitario": detalle.PrecioUnitario,
+                "SubTotal": detalle.SubTotal
+            } for detalle in detalles
+        ]
+        
+        # Formar la respuesta con la venta y sus detalles
+        result = {
+            "Venta_ID": venta.Venta_ID,
+            "Cliente_Nombre": venta.cliente.Nombre,
+            "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+            "FechaVenta": venta.FechaVenta.isoformat(),
+            "Total": venta.Total,
+            "Estado": venta.Estado,
+            "Detalles": detalles_result
+        }
+        return jsonify({"success": True, "data": result}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    
+# Eliminar una venta (DELETE)
+@venta.route('/delete/<int:Venta_ID>', methods=['DELETE'])
+@login_required('Gerente')
+def delete(venta_id):
+    try:
+        venta = Venta.query.get(venta_id)
+        if not venta:
+            return jsonify({"success": False, "message": "Venta no encontrada"}), 404
+        
+        db.session.delete(venta)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Venta eliminada correctamente"}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+# Desactivar una venta (Actualizar Estado a 0)
+@venta.route('/desactivar/<int:venta_id>', methods=['POST'])
+@login_required('Gerente')
+def desactivar(venta_id):
+    try:
+        venta = Venta.query.get(venta_id)
+        if not venta:
+            return jsonify({"success": False, "message": "Venta no encontrada"}), 404
+        
+        venta.Estado = 0  # Cambia el estado a inactivo
+        db.session.commit()
+        return jsonify({"success": True, "message": "Venta desactivada correctamente"}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500

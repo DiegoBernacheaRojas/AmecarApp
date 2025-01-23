@@ -17,7 +17,7 @@ def index():
     return render_template('index.html', permisos=permisos)
 
 @main_bp.route('/ventas')
-@login_required('Gerente','Empleado')
+@login_required('Gerente')
 def ventas():
     rol = session.get('rol', 'guest')
     permisos = ROLES_PERMISOS.get(rol, [])
@@ -36,6 +36,20 @@ def productos():
     rol = session.get('rol', 'guest')
     permisos = ROLES_PERMISOS.get(rol, [])
     return render_template('productos.html', permisos=permisos)
+
+@main_bp.route('/realizarVenta')
+@login_required('Gerente','Empleado')
+def realizarVenta():
+    rol = session.get('rol', 'guest')
+    permisos = ROLES_PERMISOS.get(rol, [])
+    return render_template('realizarVenta.html', permisos=permisos)
+
+@main_bp.route('/empleados')
+@login_required('Gerente')
+def empleados():
+    rol = session.get('rol', 'guest')
+    permisos = ROLES_PERMISOS.get(rol, [])
+    return render_template('empleados.html', permisos=permisos)
 
 @main_bp.route('/acceso_denegado')
 @login_required('Empleado')

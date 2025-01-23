@@ -38,3 +38,11 @@ document.getElementById('logout-button').addEventListener('click', async functio
         alert('Ocurrió un error inesperado.');
     }
 });
+
+const dropdownButton = document.getElementById('dropdown-admin');
+const dropdownContent = document.getElementById('dropdown-content');
+
+// Alternar la visibilidad del menú desplegable al hacer clic
+dropdownButton.addEventListener('click', () => {
+    dropdownContent.classList.toggle('active');
+});
