@@ -150,3 +150,18 @@ class DetalleVenta(db.Model):
     Cantidad = db.Column(db.Integer, nullable=False)
     PrecioUnitario = db.Column(db.Numeric(10, 2), nullable=False)
     Estado = db.Column(db.Boolean, nullable=False)
+
+class RUC(db.Model):
+    __tablename__ = 'RUC'
+
+    RUC_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  # RUC_ID autoincrementable
+    RUC = db.Column(db.String(11), nullable=False)  # RUC de 11 caracteres
+    razon_social = db.Column(db.String(255), nullable=False)  # Razón social de hasta 255 caracteres
+    direccion = db.Column(db.String(255), nullable=False)  # Dirección de hasta 255 caracteres
+    
+class DNI(db.Model):
+    __tablename__ = 'DNI'
+
+    DNI_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  # DNI_ID autoincrementable
+    Dni = db.Column(db.String(20), nullable=False)  # Dni de hasta 20 caracteres
+    Nombre = db.Column(db.String(255), nullable=False)  # Nombre de hasta 255 caracteres

@@ -76,3 +76,48 @@ def calcular_total():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@venta.route('/guardar_documento', methods=['POST'])
+@login_required('Gerente','Empleado')
+def guardar_documento():
+    data = request.get_json()
+    tipoDocumento = data.get('tipoDocumento')
+
+    if tipoDocumento == 'boleta':
+        dni = data.get('dni')
+        nombre = data.get('nombre')
+
+        # Verificar si el DNI ya existe
+        cliente = dni.query.filter_by(Dni=dni).first()
+        if cliente:
+            # Si ya existe, no hacer nada (solo mostrar los datos existentes)
+            return jsonify({'message': 'DNI ya registrado', 'cliente': cliente.Dni, 'nombre': cliente.Nombre})
+        else:
+            # Si no existe, insertar nuevo DNI
+            nuevo_cliente = dni(Dni=dni, Nombre=nombre)
+            db.session.add(nuevo_cliente)
+            db.session.commit()
+            return jsonify({'message': 'DNI guardado correctamente'})
+
+    elif tipoDocumento == 'factura':
+        ruc = data.get('ruc')
+        razonSocial = data.get('razonSocial')
+        direccion = data.get('direccion')
+
+        # Verificar si el RUC ya existe
+        empresa = ruc.query.filter_by(Ruc=ruc).first()
+        if empresa:
+            # Si ya existe, devolver los datos de la empresa
+            return jsonify({
+                'message': 'RUC encontrado',
+                'ruc': empresa.Ruc,
+                'razonSocial': empresa.RazonSocial,
+                'direccion': empresa.Direccion
+            })
+        else:
+            # Si no existe, insertar nuevo RUC
+            nueva_empresa = ruc(Ruc=ruc, RazonSocial=razonSocial, Direccion=direccion)
+            db.session.add(nueva_empresa)
+            db.session.commit()
+            return jsonify({'message': 'RUC guardado correctamente'})
+
+    return jsonify({'message': 'Tipo de documento no válido'})

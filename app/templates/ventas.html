@@ -17,6 +17,7 @@
                         <th>Precio Unitario</th>
                         <th>Cantidad</th>
                         <th>Total</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,32 +34,81 @@
 
         <!-- Columna 2: Formularios -->
         <div class="formulario-columna">
-            <h3>Formulario de Venta</h3>
             <form id="ventaForm" onsubmit="return false;">
                 <label for="codigo_barras">Código de Barras:</label>
                 <input type="text" id="codigo_barras" name="codigo_barras" autofocus placeholder="Escanee el código aquí" onkeypress="submitCodigo(event)">
             </form>
+            <!-- Div para los dos formularios (Método de Pago y Documento) -->
+            <div class="formulario-div">
+                <!-- Formulario de Método de Pago -->
+                <div class="documento-form">
+                    <form id="documentoForm">
+                        <h3>Documento</h3>
+                        <label for="documento">Seleccione el tipo de documento:</label>
+                        <select id="documento" name="documento" required>
+                            <option value="" disabled selected>Seleccione una opción</option>
+                            <option value="boleta">Boleta</option>
+                            <option value="factura">Factura Electrónica</option>
+                        </select>
 
-            <!-- Formulario de Método de Pago -->
-            <h3>Método de Pago</h3>
-            <form id="metodoPagoForm">
-                <label for="metodo_pago">Seleccione el método de pago:</label>
-                <select id="metodo_pago" name="metodo_pago" required>
-                    <option value="" disabled selected>Seleccione una opción</option>
-                    <option value="efectivo">Efectivo</option>
-                    <option value="tarjeta">Tarjeta</option>
-                    <option value="yape">YAPE</option>
-                    <option value="plin">PLIN</option>
-                </select>
+                        <!-- Campos adicionales dependiendo del tipo de documento -->
+                        <div id="detallesDocumento"></div>
 
-                <!-- Campos adicionales dependiendo del método de pago -->
-                <div id="detallesPago"></div>
+                    </form>
+                </div>
+                <!-- Formulario de Documento (Boleta o Factura) -->
+                <div class="metodo-pago-form">
+                    <form id="metodoPagoForm">
+                        <h3>Método de Pago</h3>
+                        <label for="metodo_pago">Seleccione el método de pago:</label>
+                        <select id="metodo_pago" name="metodo_pago" required>
+                            <option value="" disabled selected>Seleccione una opción</option>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="yape">YAPE</option>
+                            <option value="plin">PLIN</option>
+                        </select>
 
-                <button type="submit" id="confirmarPago">Confirmar Pago</button>
-            </form>
+                        <!-- Campos adicionales dependiendo del método de pago -->
+                        <div id="detallesPago"></div>
+                    </form>
+                </div>
+            </div>
+            <button type="button" id="confirmarPago" onclick="procesarVenta()">Confirmar Pago</button>
         </div>
     </div>
 </div>
+<!-- Contenedor de la Boleta (Oculto inicialmente) -->
+<div id="boleta" style="display: none;">
+    <h1>AMECAR</h1>
+    <p>RUC:20604706514</p>
+    <p>Inca 636, LIMA-LIMA-Surquillo </p>
+    <h2 id="titulo_boleta">Boleta Electrónica</h2>
+    <p><strong>Fecha y Hora:</strong> <span id="fecha_boleta"></span> <span id="hora_boleta"></span></p>
+    <p><strong>Moneda:</strong> Soles</p>
+    <p><strong>Forma de pago:</strong> <span id="forma_pago">Efectivo</span></p>
+    <hr>
+    <h3>Datos del Cliente</h3>
+    <p id="datos_cliente"></p>
+    <hr>
+    <h3>Detalle de la Venta</h3>
+    <table border="1" width="100%">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody id="detalle_venta"></tbody>
+    </table>
+    <hr>
+    <h3>Total a Pagar: <span id="total_boleta"></span></h3>
+</div>
 <link rel="stylesheet" href="../static/css/style_ventas.css">
 <script src="../static/js/ventas.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<SCRipt src="../static/js/PDF-BOLETA.JS"></SCRipt>
+
 {% endblock %}

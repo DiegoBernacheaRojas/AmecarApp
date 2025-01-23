@@ -49,6 +49,9 @@
                 {% if 'clientes' in permisos %}
                 <li><a href="/clientes" id="clientes-link">Clientes</a></li>
                 {% endif %}
+                {% if 'detalleventa' in permisos %}
+                <li><a href="/detalleventa" id="detalleventa-link">Detalles de venta</a></li>
+                {% endif %}
             </ul>
         </nav>
         <div class="sidebar-footer">
@@ -69,10 +72,10 @@
         {% endblock %}
     </div>
 
-    <!-- Footer -->
+    <!-- Footer 
     <footer class="footer">
         Pie de página
-    </footer>
+    </footer>-->
 
     <script src="../static/js/base.js"></script>
     
