@@ -225,3 +225,23 @@ def desactivar(Cliente_ID):
             "message": "Error al eliminar el cliente.",
             "error": str(e)
         }), 500
+@cliente.route("/guardar", methods=["POST"])
+def guardar_cliente():
+    data = request.json
+    if not data.get("RUC") or not data.get("RazonSocial"):
+        return jsonify({"error": "RUC y Razón Social son obligatorios"}), 400
+
+    try:
+        nuevo_cliente = Cliente(
+            RUC=data["RUC"],
+            RazonSocial=data["RazonSocial"],
+            Direccion=data.get("Direccion", "")
+        )
+
+        db.session.add(nuevo_cliente)
+        db.session.commit()
+
+        return jsonify({"message": "Cliente guardado con éxito"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500

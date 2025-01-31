@@ -1,3 +1,5 @@
+import datetime
+from app.models import Empleado, Cliente
 from flask import Blueprint, jsonify, request
 from app import db
 from ..models import Venta, DetalleVenta
@@ -136,3 +138,42 @@ def desactivar(venta_id):
         return jsonify({"success": True, "message": "Venta desactivada correctamente"}), 200
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+    
+
+
+@venta.route("/registrar", methods=["POST"])
+def registrar_venta():
+    data = request.json
+    # Verificar que los datos esenciales estén en la solicitud
+    required_fields = ["Empleado_ID", "TipoDocumento", "MetodoPago", "TotalVenta"]
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Faltan datos obligatorios"}), 400
+
+    # Verificar si el empleado existe
+    empleado = Empleado.query.filter_by(Empleado_ID=data["Empleado_ID"]).first()
+    if not empleado:
+        return jsonify({"error": "Empleado no encontrado"}), 404
+
+    # Verificar si el cliente existe
+    cliente = Cliente.query.filter_by(Cliente_ID=data.get("Cliente_ID")).first()  # Cliente_ID puede ser opcional
+    if not cliente:
+        return jsonify({"error": "Cliente no encontrado"}), 404
+
+    try:
+        nueva_venta = Venta(
+            Cliente_ID=data.get("Cliente_ID", "Clientes Varios"),  # Usar un cliente por defecto si no se pasa
+            Empleado_ID=data["Empleado_ID"],
+            FechaVenta=datetime.utcnow(),
+            Estado=1,  # Por defecto
+            TipoDocumento=data["TipoDocumento"],
+            MetodoPago=data["MetodoPago"],
+            TotalVenta=data["TotalVenta"]
+        )
+        
+        db.session.add(nueva_venta)
+        db.session.commit()
+
+        return jsonify({"message": "Venta registrada con éxito"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500

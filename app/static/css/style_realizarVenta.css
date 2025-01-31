@@ -265,3 +265,103 @@ button:hover {
     padding: 5px;
     margin-bottom: 10px;
 }
+/* General: Ajustes a la columna de los formularios */
+.formulario-columna {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.formulario-fila {
+    display: flex;
+    justify-content: space-between; /* Alinea los formularios en una fila */
+}
+
+.formulario-columna h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.formulario-columna select,
+.formulario-columna input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Para las dos columnas dentro de la fila */
+.formulario-columna {
+    flex: 1; /* Cada columna ocupa el 50% del espacio */
+    margin-right: 10px;
+}
+
+/* Ajuste para el último formulario para que no tenga margen derecho */
+.formulario-columna:last-child {
+    margin-right: 0;
+}
+
+button#confirmarPago {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button#confirmarPago:hover {
+    background-color: #00b31e;
+}
+/* Ajuste para el formulario de código de barras */
+#ventaForm {
+    margin-bottom: 20px; /* Espacio entre el formulario de código de barras y los formularios de abajo */
+    padding: 10px;
+}
+
+/* Ajuste de espacio entre la columna de formularios y los formularios dentro de ella */
+.formulario-columna {
+    padding: 20px; /* Aseguramos que la columna tenga un padding para espaciar los formularios */
+}
+
+/* Espaciado entre formularios dentro de la fila */
+.formulario-fila {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Espacio entre los formularios */
+    padding-bottom: 20;
+}
+
+/* Añadir margen superior al primer formulario en la fila */
+form {
+    flex: 1;
+    padding: 10px;
+    margin: 0;
+}
+.formulario-columna {
+    padding-bottom: 70px; /* Más espacio para el botón dentro del contenedor */
+    position: relative;
+    padding-bottom: 20px; 
+}
+
+button#confirmarPago {
+     /* Mantiene una distancia de 20px desde la parte derecha del contenedor */
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button#confirmarPago:hover {
+    background-color: #00b31e;
+}
+.campo-invalido {
+    border: 2px solid red;
+    background-color: #ffcccc;
+}

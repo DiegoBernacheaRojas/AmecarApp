@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 from app import db
 from ..models import Empleado
 from ..utils import login_required
@@ -177,4 +177,9 @@ def desactivar(Empleado_ID):
             "message": "Error al eliminar el empleado.",
             "error": str(e)
         }), 500
-    
+@empleado.route("/obtener", methods=["GET"])
+def obtener_empleado():
+    empleado_id = session.get("empleado_id")  # Suponiendo que el ID se guarda en sesión
+    if not empleado_id:
+        return jsonify({"error": "Empleado no autenticado"}), 401
+    return jsonify({"Empleado_ID": empleado_id})

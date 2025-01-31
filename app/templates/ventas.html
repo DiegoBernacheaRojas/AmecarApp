@@ -3,228 +3,53 @@
 {% block title %}Ventas{% endblock %}
 
 {% block content %}
-<div class="content-title">Registro de Ventas</div>
+<div class="content-title">Ventas</div>
 
 <div class="content">
-
-    <div class="content-layout">
-        <!-- Columna 1: Productos en Venta -->
-        <div class="productos-columna">
-            <h3>Productos en Venta</h3>
-            <table id="tablaVenta">
-                <thead>
-                    <tr>
-                        <th>Código de Barra</th>
-                        <th>Descripción</th>
-                        <th>Precio Unitario</th>
-                        <th>Cantidad</th>
-                        <th>Total</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Aquí aparecerán los productos agregados -->
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td><strong>Total:</strong></td>
-                        <td id="totalVenta">0.00</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-
-        <!-- Columna 2: Formularios -->
-        <div class="formulario-columna">
-            <form id="ventaForm" onsubmit="return false;">
-                <label for="codigo_barras">Código de Barras:</label>
-                <input type="text" id="codigo_barras" name="codigo_barras" autofocus placeholder="Escanee el código aquí" onkeypress="submitCodigo(event)">
-            </form>
-            <!-- Div para los dos formularios (Método de Pago y Documento) -->
-            <div class="formulario-div">
-                <!-- Formulario de Método de Pago -->
-                <div class="documento-form">
-                    <form id="documentoForm">
-                        <h3>Documento</h3>
-                        <label for="documento">Seleccione el tipo de documento:</label>
-                        <select id="documento" name="documento" required>
-                            <option value="" disabled selected>Seleccione una opción</option>
-                            <option value="boleta">Boleta</option>
-                            <option value="factura">Factura Electrónica</option>
-                        </select>
-
-                        <!-- Campos adicionales dependiendo del tipo de documento -->
-                        <div id="detallesDocumento"></div>
-
-                    </form>
-                </div>
-                <!-- Formulario de Documento (Boleta o Factura) -->
-                <div class="metodo-pago-form">
-                    <form id="metodoPagoForm">
-                        <h3>Método de Pago</h3>
-                        <label for="metodo_pago">Seleccione el método de pago:</label>
-                        <select id="metodo_pago" name="metodo_pago" required>
-                            <option value="" disabled selected>Seleccione una opción</option>
-                            <option value="efectivo">Efectivo</option>
-                            <option value="tarjeta">Tarjeta</option>
-                            <option value="yape">YAPE</option>
-                            <option value="plin">PLIN</option>
-                        </select>
-
-                        <!-- Campos adicionales dependiendo del método de pago -->
-                        <div id="detallesPago"></div>
-                    </form>
-                </div>
-            </div>
-            <button type="button" id="confirmarPago" onclick="procesarVenta()">Confirmar Pago</button>
-        </div>
-    </div>
-</div>
-<!-- Contenedor de la Boleta (Oculto inicialmente) -->
-<div id="boleta" style="display: none;">
-    <h1>AMECAR</h1>
-    <p>RUC:20604706514</p>
-    <p>Inca 636, LIMA-LIMA-Surquillo </p>
-    <h2 id="titulo_boleta">Boleta Electrónica</h2>
-    <p><strong>Fecha y Hora:</strong> <span id="fecha_boleta"></span> <span id="hora_boleta"></span></p>
-    <p><strong>Moneda:</strong> Soles</p>
-    <p><strong>Forma de pago:</strong> <span id="forma_pago">Efectivo</span></p>
-    <hr>
-    <h3>Datos del Cliente</h3>
-    <p id="datos_cliente"></p>
-    <hr>
-    <h3>Detalle de la Venta</h3>
-    <table border="1" width="100%">
-        <thead>
-            <tr>
-                <th>Producto</th>
-                <th>Cantidad</th>
-                <th>Precio Unitario</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody id="detalle_venta"></tbody>
-    </table>
-    <hr>
-    <h3>Total a Pagar: <span id="total_boleta"></span></h3>
-</div>
-<link rel="stylesheet" href="../static/css/style_ventas.css">
-<script src="../static/js/ventas.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<SCRipt src="../static/js/PDF-BOLETA.JS"></SCRipt>
-
-{% endblock %}
-
+    <!-- Eliminado el botón de nueva venta -->
     <br><br>
+
+    <!-- Tabla de ventas -->
     <table id="tablaVentas" class="table table-striped table-bordered">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>ID Venta</th>
                 <th>Cliente</th>
                 <th>Empleado</th>
-                <th>Total</th>
                 <th>Fecha de Venta</th>
+                <th>Estado</th>
+                <th>Tipo de Documento</th>
+                <th>Método de Pago</th>
+                <th>Total Venta</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Carga dinámica -->
+            <!-- Ventas cargadas dinámicamente -->
         </tbody>
     </table>
 </div>
 
-<!-- Modal para ver detalles de la venta -->
-<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="ventaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<!-- Modal de confirmación de anulación -->
+<div class="modal fade" id="confirmarAnularModal" tabindex="-1" role="dialog" aria-labelledby="confirmarAnularModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="ventaModalLabel">Detalles de la Venta</h5>
+                <h5 class="modal-title" id="confirmarAnularModalLabel">Confirmación de Anulación</h5>
                 <button type="button" class="btn btn-link p-0 cerrarBtn" style="text-decoration: none;">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="ventaForm">
-                    <div class="row">
-                        <!-- Información general de la venta -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="clienteVenta">Cliente</label>
-                                <input type="text" class="form-control" id="clienteVenta" readonly>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="empleadoVenta">Empleado</label>
-                                <input type="text" class="form-control" id="empleadoVenta" readonly>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="fechaVenta">Fecha de Venta</label>
-                                <input type="text" class="form-control" id="fechaVenta" readonly>
-                            </div>
-                        </div>
-                    </div>  
-                    <br>
-                    <!-- Tabla de detalles de venta -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="tabla-scroll">
-                                <table id="tablaDetalles" class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Descripción del Producto</th>
-                                            <th>Precio Unitario</th>
-                                            <th>Cantidad</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Las filas se agregarán dinámicamente -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <div class="form-group">
-                            <label for="totalVenta">Total</label>
-                            <input type="text" class="form-control" id="totalVenta" readonly>
-                        </div>
-                    </div>
-                </form>
+                ¿Estás seguro de que deseas anular esta venta?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary cerrarBtn">Cerrar</button>
+                <button type="button" class="btn btn-secondary cerrarBtn">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmarAnular">Anular</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal de confirmación de eliminación -->
-<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" role="dialog" aria-labelledby="confirmarEliminarModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmación de Eliminación</h5>
-                <button type="button" class="btn btn-link p-0 cerrarBtn" style="text-decoration: none; " >
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ¿Estás seguro de que deseas eliminar este registro de venta?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary cerrarBtn" >Cancelar</button>
-                <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<link rel="stylesheet" href="../static/css/style_venta.css">
 <script src="../static/js/ventas.js"></script>
 {% endblock %}
-

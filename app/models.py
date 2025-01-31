@@ -1,3 +1,4 @@
+from datetime import datetime
 from app import db
 from sqlalchemy import text
 
@@ -134,15 +135,16 @@ class Venta(db.Model):
     __tablename__ = 'Venta'
 
     Venta_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Cliente_ID = db.Column(db.Integer, db.ForeignKey('Cliente.Cliente_ID'), nullable=False)
+    Cliente_ID = db.Column(db.Integer, db.ForeignKey('Cliente.Cliente_ID'), nullable=False,default=True)
     Empleado_ID = db.Column(db.Integer, db.ForeignKey('Empleado.Empleado_ID'), nullable=False)
-    FechaVenta = db.Column(db.Date, nullable=False)
-    Total = db.Column(db.Numeric(10, 2), nullable=False, server_default=text("0.00"))
-    Estado = db.Column(db.Boolean, nullable=False)
+    FechaVenta = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)  # Usa DateTime si necesitas fecha y hora
+    Estado = db.Column(db.Boolean, nullable=False, default=True)  # 'bit' en SQL Server se mapea a Boolean en SQLAlchemy
+    TipoDocumento = db.Column(db.String(20), nullable=False)  # Se ajusta a varchar(20)
+    MetodoPago = db.Column(db.String(20), nullable=False)  # Se ajusta a varchar(20)
+    TotalVenta = db.Column(db.Numeric(18, 2), nullable=False)  # Se ajusta a decimal(18, 2)
 
     # Relación con DetalleVenta
     detalles = db.relationship('DetalleVenta', backref='venta', lazy=True)
-
 
 class DetalleVenta(db.Model):
     __tablename__ = 'DetalleVenta'
