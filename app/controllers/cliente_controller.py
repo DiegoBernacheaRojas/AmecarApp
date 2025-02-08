@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app import db
+from sqlalchemy.exc import SQLAlchemyError
 from ..models import Cliente
 from ..utils import login_required
 
@@ -225,3 +226,38 @@ def desactivar(Cliente_ID):
             "message": "Error al eliminar el cliente.",
             "error": str(e)
         }), 500
+    
+@cliente.route('/getRucODni', methods=['POST'])
+@login_required('Gerente', 'Empleado')
+def getRucODni():
+    data = request.get_json()
+    
+    tipo = data.get("tipo")  # Puede ser "dni" o "ruc"
+    numero = data.get("numero")  # Número de DNI o RUC
+
+    # Validaciones
+    if tipo not in ["dni", "ruc"]:
+        return jsonify({"success": False, "message": "Tipo inválido. Debe ser 'dni' o 'ruc'."}), 400
+    if not numero or not numero.isdigit():
+        return jsonify({"success": False, "message": "Número inválido."}), 400
+
+    try:
+        # Buscar en la base de datos
+        cliente = Cliente.query.filter_by(NumDoc=numero).first()
+
+        if cliente:
+            return jsonify({
+                "success": True,
+                "Cliente_ID": cliente.Cliente_ID,
+                "Nombre": cliente.Nombre,
+                "TipoCliente": cliente.TipoCliente,
+                "Telefono": cliente.Telefono,
+                "Correo": cliente.Correo,
+                "Direccion": cliente.Direccion,
+                "Estado": cliente.Estado
+            })
+        else:
+            return jsonify({"success": False, "message": "Cliente no encontrado."}), 404
+
+    except SQLAlchemyError as e:
+        return jsonify({"success": False, "message": "Error al consultar la base de datos", "error": str(e)}), 500

@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Detalles de venta{% endblock %}
+
+{% block content %}
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Detalles de Venta</h1>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-gray-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">Registro de Ventas</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <table id="tablaVentas" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Comprador</th>
+                                    <th>N° Documento</th>
+                                    <th>Empleado</th>
+                                    <th>Tipo de pago</th>
+                                    <th>Tipo de venta</th>
+                                    <th>Total</th>
+                                    <th>Fecha de Venta</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Productos cargados dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.row -->
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-nuevo">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content card card-info" id="color-modal">
+            <!-- Cabecera del modal -->
+            <div class="modal-header card-header">
+                <h4 class="modal-title" id="modal-nuevoLabel">Detalles de venta</h4>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <!-- Contenido del modal -->
+            <div class="modal-body card-body">
+                <form id="form">
+                    <!-- Información general de la venta -->
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="compradorVenta">Comprador</label>
+                                <input type="text" class="form-control" id="compradorVenta" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="empleadoVenta">Empleado</label>
+                                <input type="text" class="form-control" id="empleadoVenta" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="fechaVenta">Fecha de Venta</label>
+                                <input type="text" class="form-control" id="fechaVenta" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del Documento -->
+                    <div class="row mb-3">
+                        <!-- Columna para Tipo de Venta (más pequeño) -->
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label for="tipoVentaInput">Tipo de Venta</label>
+                            <input type="text" class="form-control" id="tipoVentaInput" readonly>
+                          </div>
+                        </div>
+                        <!-- Columna para los otros datos del documento -->
+                        <div class="col-md-9" id="datosDocumentoContainer">
+                          <!-- Bloque para Boleta: DNI y Nombre (se muestran en una sola fila) -->
+                          <div class="row" id="documentoBoleta" style="display: none;">
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="dniInput">DNI</label>
+                                <input type="text" class="form-control" id="dniInput" readonly>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="nombreInput">Nombre</label>
+                                <input type="text" class="form-control" id="nombreInput" readonly>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Bloque para Factura: RUC, Razón Social y Dirección (en una sola línea) -->
+                          <div class="row" id="documentoFactura" style="display: none;">
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label for="rucInput">RUC</label>
+                                <input type="text" class="form-control" id="rucInput" readonly>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label for="razonSocialInput">Razón Social</label>
+                                <input type="text" class="form-control" id="razonSocialInput" readonly>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label for="direccionInput">Dirección</label>
+                                <input type="text" class="form-control" id="direccionInput" readonly>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del Pago -->
+                    <div class="row" id="pagoDetalleRow" style="display: none;">
+                        <!-- Tipo de Pago (siempre visible) -->
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="tipoPagoInput">Tipo de Pago</label>
+                                <input type="text" class="form-control" id="tipoPagoInput" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Bloque para Pago Efectivo -->
+                        <div class="col-md-4" id="efectivoBlock" style="display: none;">
+                            <div class="form-group">
+                                <label for="montoEntregadoInput">Monto Entregado</label>
+                                <input type="text" class="form-control" id="montoEntregadoInput" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="efectivoBlock2" style="display: none;">
+                            <div class="form-group">
+                                <label for="vueltoInput">Vuelto</label>
+                                <input type="text" class="form-control" id="vueltoInput" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Bloque para Pago Tarjeta -->
+                        <div class="col-md-8" id="tarjetaBlock" style="display: none;">
+                            <div class="form-group">
+                                <label for="numeroTransferenciaInput">Número de Transferencia</label>
+                                <input type="text" class="form-control" id="numeroTransferenciaInput" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Bloque para Pago Yape/Plin -->
+                        <div class="col-md-8" id="celularBlock" style="display: none;">
+                            <div class="form-group">
+                                <label for="numeroCelularInput">Número Celular</label>
+                                <input type="text" class="form-control" id="numeroCelularInput" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de productos -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Productos</h3>
+                                </div>
+                                <div class="card-body table-responsive p-0" style="height: 300px;">
+                                    <table id="tablaDetalles" class="table table-head-fixed text-nowrap">
+                                        <thead>
+                                            <tr>
+                                                <th>Descripción del Producto</th>
+                                                <th class="text-center">Precio Unitario</th>
+                                                <th class="text-center">Cantidad</th>
+                                                <th class="text-center">Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="row">
+                        <div class="col-md-3 offset-md-9">
+                            <div class="form-group text-right">
+                                <label for="totalVenta">Total</label>
+                                <input type="text" class="form-control text-right" id="totalVenta" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Footer del modal -->
+            <div class="modal-footer card-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="modal-confirm">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card card-danger">
+            <!-- Cabecera del modal -->
+            <div class="modal-header card-header">
+                <h4 class="modal-title">Confirmar</h4>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <!-- Contenido del modal -->
+            <div class="modal-body card-body">
+                <label>¿Estás seguro de que deseas eliminar esta venta? Esta acción no se puede deshacer.</label>
+            </div>
+            <!-- Footer del modal -->
+            <div class="modal-footer card-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" id="confirmarEliminar">Aceptar</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+{% endblock %}
+
+{% block script %}
+<script src="../static/js/detalleVentas.js"></script>
+{% endblock %}

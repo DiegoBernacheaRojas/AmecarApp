@@ -1,5 +1,6 @@
 from app import db
 from sqlalchemy import text
+from sqlalchemy.dialects.mysql import JSON
 
 class Categoria(db.Model):
     __tablename__ = 'Categoria'
@@ -30,7 +31,7 @@ class Producto(db.Model):
     CodigoBarras = db.Column(db.String(30), unique=True, nullable=False)  # Nuevo campo
     Descripcion = db.Column(db.String(100))
     Precio = db.Column(db.Numeric(10, 2), nullable=False)
-    Stock = db.Column(db.Integer, nullable=False)
+    Stock = db.Column(db.Float, nullable=False)
     FechaIngreso = db.Column(db.Date, nullable=False)
     Estado = db.Column(db.Boolean, nullable=False)
 
@@ -134,11 +135,16 @@ class Venta(db.Model):
     __tablename__ = 'Venta'
 
     Venta_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Cliente_ID = db.Column(db.Integer, db.ForeignKey('Cliente.Cliente_ID'), nullable=False)
+    Cliente_ID = db.Column(db.Integer, db.ForeignKey('Cliente.Cliente_ID'), nullable=True)
     Empleado_ID = db.Column(db.Integer, db.ForeignKey('Empleado.Empleado_ID'), nullable=False)
     FechaVenta = db.Column(db.Date, nullable=False)
     Total = db.Column(db.Numeric(10, 2), nullable=False, server_default=text("0.00"))
     Estado = db.Column(db.Boolean, nullable=False)
+    # Columnas para informacion de venta
+    TipoVenta = db.Column(db.String(15), nullable=False)  # Indica si es boleta o factura
+    DatosDocumentoVenta = db.Column(JSON, nullable=True)  # Guarda el DNI o RUC según corresponda
+    TipoPago = db.Column(db.String(15), nullable=False)  # Método de pago
+    DatosPago = db.Column(JSON, nullable=True)  # Guarda datos específicos del pago
 
     # Relación con DetalleVenta
     detalles = db.relationship('DetalleVenta', backref='venta', lazy=True)
@@ -154,18 +160,3 @@ class DetalleVenta(db.Model):
     PrecioUnitario = db.Column(db.Numeric(10, 2), nullable=False)
     SubTotal = db.Column(db.Numeric(10, 2), nullable=False, server_default=text("0.00"))
     Estado = db.Column(db.Boolean, nullable=False)
-
-class RUC(db.Model):
-    __tablename__ = 'RUC'
-
-    RUC_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  # RUC_ID autoincrementable
-    RUC = db.Column(db.String(11), nullable=False)  # RUC de 11 caracteres
-    razon_social = db.Column(db.String(255), nullable=False)  # Razón social de hasta 255 caracteres
-    direccion = db.Column(db.String(255), nullable=False)  # Dirección de hasta 255 caracteres
-    
-class DNI(db.Model):
-    __tablename__ = 'DNI'
-
-    DNI_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)  # DNI_ID autoincrementable
-    Dni = db.Column(db.String(20), nullable=False)  # Dni de hasta 20 caracteres
-    Nombre = db.Column(db.String(255), nullable=False)  # Nombre de hasta 255 caracteres

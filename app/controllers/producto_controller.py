@@ -6,7 +6,7 @@ from ..utils import login_required
 producto = Blueprint('producto', __name__)
 
 @producto.route('/getAll', methods=['GET'])
-@login_required('Gerente')
+@login_required('Gerente','Empleado')
 def getAll():
     try:
         productos = Producto.query.filter_by(Estado=True).all()
@@ -74,6 +74,7 @@ def register():
             Precio = data.get('Precio'),
             Stock = data.get('Stock'),
             FechaIngreso = data.get('FechaIngreso'),
+            Estado = True,
         )
         db.session.add(nuevo_producto)
         db.session.commit()
@@ -99,12 +100,13 @@ def update(Producto_ID):
         if not producto:
             return jsonify({"success": False, "message": "Producto no encontrado"}), 404
 
-        producto.Subcategoria_ID = data.get('Subcategoria_ID', producto.Subcategoria_ID),
-        producto.CodigoBarras = data.get('CodigoBarras', producto.CodigoBarras),
-        producto.Descripcion = data.get('Descripcion', producto.Descripcion),
-        producto.Precio = data.get('Precio', producto.Precio),
-        producto.Stock = data.get('Stock', producto.Stock),
-        producto.FechaIngreso = data.get('FechaIngreso', producto.FechaIngreso),
+        # Eliminar las comas adicionales que crean tuplas
+        producto.Subcategoria_ID = data.get('Subcategoria_ID', producto.Subcategoria_ID)
+        producto.CodigoBarras = data.get('CodigoBarras', producto.CodigoBarras)
+        producto.Descripcion = data.get('Descripcion', producto.Descripcion)
+        producto.Precio = data.get('Precio', producto.Precio)
+        producto.Stock = data.get('Stock', producto.Stock)
+        producto.FechaIngreso = data.get('FechaIngreso', producto.FechaIngreso)
 
         db.session.commit()
         return jsonify({"success": True, "message": "Producto actualizado con éxito"}), 200

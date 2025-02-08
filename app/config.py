@@ -1,4 +1,4 @@
 ROLES_PERMISOS = {
-    'Gerente': ['realizarVenta','ventas', 'productos', 'clientes','empleados','home'],
-    'Empleado': ['realizarVenta', 'home'],
+    'Gerente': ['detalleVentas','ventas', 'productos', 'clientes','empleados','home'],
+    'Empleado': ['ventas', 'home'],
 }

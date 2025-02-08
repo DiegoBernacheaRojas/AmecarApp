@@ -1,590 +1,491 @@
+let tiempoEspera;
+const inputCodigo = document.getElementById("codigoBarras");
 
-document.addEventListener("DOMContentLoaded", () => {
-    const metodoPagoSelect = document.getElementById('metodo_pago');
-    const detallesPagoDiv = document.getElementById('detallesPago');
-    const confirmarPagoButton = document.getElementById('confirmarPago');
-    const tablaVenta = document.querySelector('#tablaVenta tbody'); // Tabla de productos
-    const totalVentaDisplay = document.getElementById('totalVenta'); // Donde se muestra el total
-    const inputCodigoBarras = document.getElementById("codigo_barras");
-    const mensajeDiv = document.createElement("div");
-    inputCodigoBarras.parentNode.appendChild(mensajeDiv); // Mostrar mensajes cerca del input
-    let montoEntregadoInput, cambioInput, montoTotalInput;
-    let buscarTimeout;
-
-    // Función para calcular el total de productos en la tabla
-    function calcularTotalDeProductos() {
-        const totalVenta = Array.from(tablaVenta.querySelectorAll('.total')) // Busca celdas con clase "total"
-            .reduce((sum, cell) => sum + parseFloat(cell.textContent || 0), 0);
-
-        totalVentaDisplay.textContent = `S/. ${totalVenta.toFixed(2)}`; // Actualiza el total en pantalla
-        return totalVenta;
-    }
-
-    // Escuchar cambios en el código de barras para buscar y agregar producto
-    inputCodigoBarras.addEventListener("input", () => {
-        clearTimeout(buscarTimeout);
-        const codigoBarras = inputCodigoBarras.value.trim();
-        if (!codigoBarras) return;
-
-        buscarTimeout = setTimeout(() => buscarYAgregarProducto(codigoBarras), 300);
-    });
-
-    async function buscarYAgregarProducto(codigoBarras) {
-        try {
-            // Verificar si el producto ya está en la tabla
-            const filaExistente = Array.from(tablaVenta.querySelectorAll("tr")).find((row) => {
-                return row.querySelector("td")?.textContent === codigoBarras;
-            });
-    
-            if (filaExistente) {
-                const cantidadInput = filaExistente.querySelector(".cantidad-input");
-                cantidadInput.value = parseInt(cantidadInput.value) + 1;
-                actualizarTotal({ target: cantidadInput }); // Actualiza el total individual
-                calcularTotalGeneral(); // Recalcula el total general de la venta
-                //mostrarMensaje("Cantidad actualizada.", "success");
-                inputCodigoBarras.value = ""; // Limpiar el código de barras
-                inputCodigoBarras.focus(); // Volver a enfocar el campo
-                return;
-            }
-    
-            // Petición al servidor para buscar el producto
-            const response = await fetch("/api/venta/buscar_producto", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ codigo_barras: codigoBarras }),
-            });
-    
-            const data = await response.json();
-    
-            if (response.ok) {
-                agregarProductoATabla(data);
-                //mostrarMensaje("Producto agregado correctamente.", "success");
-                inputCodigoBarras.value = ""; // Limpiar el código de barras
-                inputCodigoBarras.focus(); // Volver a enfocar el campo
-                calcularTotalGeneral();
-            } else {
-                mostrarMensaje(data.error || "Error al buscar el producto.", "error");
-            }
-        } catch (error) {
-            mostrarMensaje("Error al comunicarse con el servidor.", "error");
-            console.error(error);
+inputCodigo.addEventListener("input", function () {
+    clearTimeout(tiempoEspera);
+    tiempoEspera = setTimeout(async () => {
+        const codigoBarras = inputCodigo.value.trim();
+        if (codigoBarras !== "") {
+            await buscarProducto(codigoBarras);
+            inputCodigo.value = ""; // Limpia el input después de procesarlo
         }
-    }
-    
-    function agregarProductoATabla(producto) {
-        const fila = document.createElement("tr");
+    }, 500); // Espera 500ms después de escribir para buscar automáticamente
+});
 
-        // Crear columnas para cada campo de producto
-        const codigoColumna = document.createElement("td");
-        codigoColumna.textContent = producto.CodigoBarras;
-
-        const descripcionColumna = document.createElement("td");
-        descripcionColumna.textContent = producto.Descripcion;
-
-        const precioColumna = document.createElement("td");
-        precioColumna.textContent = parseFloat(producto.Precio).toFixed(2);
-
-        const cantidadColumna = document.createElement("td");
-        const cantidadInput = document.createElement("input");
-        cantidadInput.type = "number";
-        cantidadInput.value = producto.Cantidad || 1; // Valor predeterminado de cantidad
-        cantidadInput.min = 1;
-        cantidadInput.className = "cantidad-input";
-        cantidadInput.dataset.precio = parseFloat(producto.Precio);
-        cantidadColumna.appendChild(cantidadInput);
-
-        const totalColumna = document.createElement("td");
-        totalColumna.className = "total";
-        const totalInicial = (producto.Cantidad || 1) * parseFloat(producto.Precio);
-        totalColumna.textContent = totalInicial.toFixed(2);
-
-        // Columna de eliminación
-        const eliminarColumna = document.createElement("td");
-        const eliminarButton = document.createElement("button");
-        eliminarButton.textContent = "X";
-        eliminarButton.className = "eliminar-producto";
-        eliminarButton.addEventListener("click", () => eliminarProducto(fila, producto.Precio));
-        eliminarColumna.appendChild(eliminarButton);
-
-        // Agregar las columnas a la fila
-        fila.appendChild(codigoColumna);
-        fila.appendChild(descripcionColumna);
-        fila.appendChild(precioColumna);
-        fila.appendChild(cantidadColumna);
-        fila.appendChild(totalColumna);
-        fila.appendChild(eliminarColumna);
-
-        // Agregar la fila a la tabla
-        tablaVenta.appendChild(fila);
-
-        // Escuchar cambios en la cantidad para recalcular el total y el total general
-        cantidadInput.addEventListener("input", (event) => {
-            actualizarTotal(event);
-            calcularTotalGeneral();
+async function buscarProducto(codigoBarras) {
+    try {
+        const response = await fetch("/api/producto/getCodBarras", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ codigo_barras: codigoBarras }),
         });
 
-        // Desplazarse automáticamente al final de la tabla
-        scrollToBottom();
-    }
-
-    function eliminarProducto(fila, precioProducto) {
-        tablaVenta.removeChild(fila); // Eliminar la fila
-        calcularTotalGeneral(); // Recalcular el total de la venta después de eliminar el producto
-        //mostrarMensaje(`Producto eliminado.`, "success");
-    }
-
-    function mostrarMensaje(mensaje, tipo) {
-        mensajeDiv.textContent = mensaje;
-        mensajeDiv.style.color = tipo === "success" ? "green" : "red";
-        mensajeDiv.style.marginTop = "10px";
-
-        // Ocultar mensaje después de 3 segundos
-        setTimeout(() => {
-            mensajeDiv.textContent = "";
-        }, 3000);
-    }
-
-    function actualizarTotal(event) {
-        const input = event.target;
-        const precio = parseFloat(input.dataset.precio);
-        const cantidad = parseInt(input.value) || 0;
-        const totalCell = input.closest("tr").querySelector(".total");
-
-        if (cantidad > 0) {
-            const total = precio * cantidad;
-            totalCell.textContent = total.toFixed(2);
-        } else {
-            totalCell.textContent = "0.00";
-        }
-    }
-
-    function calcularTotalGeneral() {
-        const total = Array.from(tablaVenta.querySelectorAll(".total"))
-            .reduce((sum, cell) => sum + parseFloat(cell.textContent || 0), 0);
-
-        totalVentaDisplay.textContent = `S/. ${total.toFixed(2)}`;
-    }
-    // Función para actualizar el total de productos al seleccionar el método de pago
-    metodoPagoSelect.addEventListener('change', function() {
-        const metodo = metodoPagoSelect.value;
-        detallesPagoDiv.innerHTML = ''; // Limpiar contenido previo
-
-        if (metodo === 'efectivo') {
-            detallesPagoDiv.innerHTML = `
-                <label for="monto_entregado">Monto Entregado:</label>
-                <input type="number" id="monto_entregado" name="monto_entregado" class="metodo-pago-input" placeholder="monto entregado">
-                <label for="monto_total" hidden>Monto Total:</label>
-                <input type="number" id="monto_total" name="monto_total" readonly hidden>
-                <label for="cambio">Cambio:</label>
-                <input type="text" id="cambio" name="cambio" placeholder="Vuelto" readonly>
-            `;
-
-            // Asignar referencias a los elementos recién creados
-            montoEntregadoInput = document.getElementById('monto_entregado');
-            cambioInput = document.getElementById('cambio');
-            montoTotalInput = document.getElementById('monto_total');
-
-            // Calcular el total de productos al seleccionar el método de pago
-            const totalVenta = calcularTotalDeProductos();
-            montoTotalInput.value = totalVenta.toFixed(2);
-
-            // Agregar evento para calcular el cambio
-            montoEntregadoInput.addEventListener('input', function() {
-                const montoEntregado = parseFloat(montoEntregadoInput.value || '0'); // Valor ingresado
-                const montoTotal = parseFloat(montoTotalInput.value || '0'); // Total calculado
-
-                if (!isNaN(montoEntregado) && montoEntregado > 0) {
-                    const cambio = montoEntregado - montoTotal;
-                    cambioInput.value = cambio >= 0 ? cambio.toFixed(2) : '0.00'; // Cambio si es suficiente
-                } else {
-                    cambioInput.value = '0.00'; // No hay cambio si no se ingresó suficiente
-                }
-            });
-        } else if (metodo === 'tarjeta') {
-            detallesPagoDiv.innerHTML = `
-                <label for="numero_transaccion">Número de Transacción:</label>
-                <input type="text" id="numero_transaccion" name="numero_transaccion" placeholder="Ingrese el número de transacción" required>
-            `;
-        } else if (metodo === 'yape' || metodo === 'plin') {
-            detallesPagoDiv.innerHTML = `
-                <label for="numero_telefono">Número de Teléfono:</label>
-                <input type="text" id="numero_telefono" name="numero_telefono" placeholder="Ingrese el número de teléfono" required pattern="^[0-9]{9}$" title="El número de teléfono debe tener 9 dígitos.">
-            `;
-        }
-// Función para inicializar la tabla de ventas
-function inicializarTablaVentas() {
-    $('#tablaVentas').DataTable({
-        ajax: {
-            url: '/api/venta/getAll', // URL de API para obtener ventas
-            dataSrc: 'data'
-        },
-        columns: [
-            { data: 'Venta_ID' },
-            { data: 'Cliente_Nombre' },
-            { data: 'Empleado_Nombre' },
-            { data: 'Total' },
-            { data: 'FechaVenta' },
-            {
-                data: null,
-                render: function (data, type, row) {
-                    return `
-                        <button class="btn btn-info btn-sm detallesBtn" data-id="${row.Venta_ID}">Detalles</button>
-                        <button class="btn btn-danger btn-sm eliminarBtn" data-id="${row.Venta_ID}">Eliminar</button>
-                    `;
-                }
-            }
-        ],
-        language: {
-            decimal: ",",
-            thousands: ".",
-            lengthMenu: "Mostrar _MENU_ registros por página",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "Mostrando 0 a 0 de 0 registros",
-            infoFiltered: "(filtrado de _MAX_ registros en total)",
-            search: "Buscar:",
-            zeroRecords: "No se encontraron registros coincidentes",
-            paginate: {
-                first: "Primero",
-                previous: "Anterior",
-                next: "Siguiente",
-                last: "Último"
-            },
-            aria: {
-                sortAscending: ": activar para ordenar la columna de manera ascendente",
-                sortDescending: ": activar para ordenar la columna de manera descendente"
-            }
-        },
-        responsive: true,
-        paging: true,
-        lengthChange: true,
-        ordering: true,
-        searching: true,
-        autoWidth: false,
-        scrollX: true,
-    });
-}
-
-// Función para limpiar campos del modal de detalles
-function limpiarModalDetalles() {
-    $('#clienteVenta').val('');
-    $('#empleadoVenta').val('');
-    $('#fechaVenta').val('');
-    $('#tablaDetalles tbody').empty();
-    $('#totalVenta').val('');
-}
-
-// Función para mostrar los detalles de una venta
-async function mostrarDetallesVenta(ventaId) {
-    try {
-        const response = await fetch(`/api/venta/getId/${ventaId}`); // URL de API para obtener detalles de venta
-        if (!response.ok) throw new Error(`Error al obtener detalles: ${response.statusText}`);
-
         const data = await response.json();
-        if (data.success) {
-            const venta = data.data;
-            $('#clienteVenta').val(venta.Cliente_Nombre);
-            $('#empleadoVenta').val(venta.Empleado_Nombre);
-            $('#fechaVenta').val(venta.FechaVenta);
-
-            // Agregar productos a la tabla de detalles
-            const tbody = $('#tablaDetalles tbody');
-            tbody.empty();
-            venta.Detalles.forEach(detalle => {
-                tbody.append(`
-                    <tr>
-                        <td>${detalle.Producto_Descripcion}</td>
-                        <td>${detalle.PrecioUnitario}</td>
-                        <td>${detalle.Cantidad}</td>
-                        <td>${detalle.SubTotal}</td>
-                    </tr>
-                `);
-            });
-
-            $('#totalVenta').val(venta.Total);
-            $('#Modal').modal('show');
-        } else {
-            alert(`Error: ${data.message}`);
+        if (!data || !data.Estado) {
+            toastr.info("El producto con ese código de barras no existe.");
+            return;
         }
+
+        agregarProductoATabla(data);
     } catch (error) {
-        console.error("Error al mostrar detalles:", error);
+        console.error("Error al buscar el producto:", error);
+        toastr.error("Error al consultar el producto.");
     }
 }
-    detallesPagoDiv.style.display = detallesPagoDiv.innerHTML ? 'block' : 'none';
-    });
 
-    confirmarPagoButton.addEventListener('click', function(e) {
-        e.preventDefault();
+function agregarProductoATabla(producto) {
+    const tabla = document.getElementById("tablaProductos").getElementsByTagName("tbody")[0];
+    const filas = tabla.getElementsByTagName("tr");
 
-        const metodo = metodoPagoSelect.value;
+    for (let fila of filas) {
+        let celdaCodigo = fila.cells[1].textContent; // Ahora la columna del código de barras es la [1]
+        if (celdaCodigo === producto.CodigoBarras) {
+            let celdaCantidad = fila.cells[4].querySelector("input"); // Ahora la columna de cantidad es la [4]
+            let cantidadActual = parseInt(celdaCantidad.value);
+            let nuevaCantidad = cantidadActual + 1;
+            celdaCantidad.value = nuevaCantidad;
 
-        if (metodo === 'efectivo') {
-            const montoEntregado = parseFloat(montoEntregadoInput.value || '0');
-            const montoTotal = parseFloat(montoTotalInput.value || '0');
-            const cambio = parseFloat(cambioInput.value || '0');
-
-            if (montoEntregado >= montoTotal || montoEntregado == 0) {
-                alert(`Pago confirmado. El cambio es: S/. ${cambio.toFixed(2)}`);
-            } else {
-                alert('Monto entregado insuficiente.');
-            }
-        } else if (metodo === 'tarjeta') {
-            alert('Pago confirmado con tarjeta.');
-        } else if (metodo === 'yape' || metodo === 'plin') {
-            alert('Pago confirmado por Yape o Plin.');
-        } else {
-            alert('Seleccione un método de pago válido.');
-        }
-    });
-
-    
-});
-
-// Función para hacer scroll hacia abajo en la tabla
-function scrollToBottom() {
-    tablaVenta.scrollTop = tablaVenta.scrollHeight;
-}
-
-// Agregar escucha de eventos para teclas F1, F2, F3, F4
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'e' || event.key === 'E') {
-        metodoPagoSelect.value = 'efectivo';
-        metodoPagoSelect.dispatchEvent(new Event('change')); // Trigger the change event to update payment details
-    } else if (event.key === 't' || event.key === 'T') {
-        metodoPagoSelect.value = 'tarjeta';
-        metodoPagoSelect.dispatchEvent(new Event('change'));
-    } else if (event.key === 'y' || event.key === 'Y') {
-        metodoPagoSelect.value = 'yape';
-        metodoPagoSelect.dispatchEvent(new Event('change'));
-    } else if (event.key === 'p' || event.key === 'P') {
-        metodoPagoSelect.value = 'plin';
-        metodoPagoSelect.dispatchEvent(new Event('change'));
-    }
-});
-document.getElementById('documento').addEventListener('change', function() {
-    var documentoSelect = this.value;
-    var detallesDocumento = document.getElementById('detallesDocumento');
-
-    detallesDocumento.innerHTML = '';  // Limpiar campos existentes
-
-    if (documentoSelect === 'boleta') {
-        // Mostrar campos para boleta (no obligatorios)
-        detallesDocumento.innerHTML = `
-            <label for="nombre">Nombre (Opcional):</label>
-            <input type="text" id="nombre" name="nombre">
-
-            <label for="dni">DNI (Opcional):</label>
-            <input type="text" id="dni" name="dni">
-        `;
-    } else if (documentoSelect === 'factura') {
-        // Mostrar campos para factura (obligatorios)
-        detallesDocumento.innerHTML = `
-            <label for="rucInput">RUC</label>
-            <input type="text" id="rucInput" name="ruc" placeholder="Ingrese el RUC" />
-
-            <label for="razonSocialInput">Razón Social</label>
-            <input type="text" id="razonSocialInput" name="razonSocial" placeholder="Razón Social" readonly />
-
-            <label for="direccionInput">Dirección</label>
-            <input type="text" id="direccionInput" name="direccion" placeholder="Dirección" readonly />
-        `;
-    }
-});
-document.getElementById('guardarDocumento').addEventListener('click', function() {
-    var documentoSelect = document.getElementById('documento').value;
-    var formData = {};
-
-    if (documentoSelect === 'boleta') {
-        formData = {
-            tipoDocumento: 'boleta',
-            dni: document.getElementById('dni').value,
-            nombre: document.getElementById('nombre').value
-        };
-    } else if (documentoSelect === 'factura') {
-        formData = {
-            tipoDocumento: 'factura',
-            ruc: document.getElementById('ruc').value,
-            razonSocial: document.getElementById('razon_social').value,
-            direccion: document.getElementById('direccion').value
-        };
-    }
-
-    // Enviar datos al servidor usando fetch
-    fetch('/guardar_documento', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Manejar la respuesta del servidor
-        console.log(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
-function procesarVenta() {
-    // Validar el método de pago
-    const metodoPago = document.getElementById('metodo_pago').value;
-    if (!metodoPago) {
-        alert('Por favor, seleccione un método de pago.');
-        return;
-    }
-
-    // Validar el tipo de documento
-    const tipoDocumento = document.getElementById('tipo_documento').value;
-    if (!tipoDocumento) {
-        alert('Por favor, seleccione el tipo de documento: Boleta o Factura.');
-        return;
-    }
-
-    // Validar los campos según el tipo de documento
-    if (tipoDocumento === 'factura') {
-        const ruc = document.getElementById('ruc').value;
-        const razonSocial = document.getElementById('razon_social').value;
-        const direccion = document.getElementById('direccion').value;
-        if (!ruc || !razonSocial || !direccion) {
-            alert('Por favor, complete todos los campos de la factura: RUC, Razón Social y Dirección.');
+            let celdaSubTotal = fila.cells[5]; // Ahora la columna de subtotal es la [5]
+            celdaSubTotal.textContent = (nuevaCantidad * producto.Precio).toFixed(2);
+            actualizarTotal();
             return;
         }
     }
 
-    // Generar la boleta o factura
-    generarBoleta();
+    // Si el producto no está en la tabla, se agrega una nueva fila
+    let fila = tabla.insertRow();
+    fila.innerHTML = `
+        <td class="text-center" style="display: none;">${producto.Producto_ID}</td>
+        <td class="text-center">${producto.CodigoBarras}</td>
+        <td style="max-width: 500px; word-wrap: break-word; white-space: normal;">${producto.Descripcion}</td>
+        <td class="text-center">${producto.Precio.toFixed(2)}</td>
+        <td class="text-center" style="display: flex; justify-content: center; align-items: center;">
+            <input type="number" class="form-control text-center cantidadInput" value="1" min="1" style="width: 100px;">
+        </td>
+        <td class="text-center">${producto.Precio.toFixed(2)}</td>
+        <td class="text-center">
+            <button class="btn btn-danger btn-sm" onclick="eliminarFila(this)">
+                <i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                        fill="currentColor" class="bi bi-bag-x-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M10.5 3.5a2.5 2.5 0 0 0-5 0V4h5zm1 0V4H15v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V4h3.5v-.5a3.5 3.5 0 1 1 7 0M6.854 8.146a.5.5 0 1 0-.708.708L7.293 10l-1.147 1.146a.5.5 0 0 0 .708.708L8 10.707l1.146 1.147a.5.5 0 0 0 .708-.708L8.707 10l1.147-1.146a.5.5 0 0 0-.708-.708L8 9.293z" />
+                    </svg>
+                </i>
+            </button>
+        </td>
+    `;
 
-    // Opcional: Limpia los formularios después de confirmar
-    document.getElementById('ventaForm').reset();
-    document.getElementById('metodoPagoForm').reset();
+    actualizarTotal();
+    agregarEventosCantidad();
 }
-function generarBoleta() {
-    const fecha = new Date().toLocaleDateString();
-    document.getElementById('fecha_boleta').innerText = fecha;
 
-    // Obtener datos del cliente según el tipo de documento
-    const tipoDocumento = document.getElementById('tipo_documento').value;
-    let datosCliente = '';
-    if (tipoDocumento === 'boleta') {
-        const nombre = document.getElementById('nombre').value || 'No especificado';
-        const dni = document.getElementById('dni').value || 'No especificado';
-        datosCliente = `<strong>Nombre:</strong> ${nombre}<br><strong>DNI:</strong> ${dni}`;
-    } else if (tipoDocumento === 'factura') {
-        const ruc = document.getElementById('ruc').value;
-        const razonSocial = document.getElementById('razon_social').value;
-        const direccion = document.getElementById('direccion').value;
-        datosCliente = `<strong>RUC:</strong> ${ruc}<br><strong>Razón Social:</strong> ${razonSocial}<br><strong>Dirección:</strong> ${direccion}`;
-    }
-    document.getElementById('datos_cliente').innerHTML = datosCliente;
-
-    // Obtener detalles de la venta
-    const tablaVenta = document.querySelector('#tablaVenta tbody');
-    const detalleVenta = document.getElementById('detalle_venta');
-    detalleVenta.innerHTML = ''; // Limpiar contenido previo
-    let total = 0;
-
-    tablaVenta.querySelectorAll('tr').forEach((row) => {
-        const celdas = row.querySelectorAll('td');
-        const descripcion = celdas[1]?.innerText;
-        const cantidad = celdas[3]?.innerText;
-        const precioUnitario = celdas[2]?.innerText;
-        const subtotal = celdas[4]?.innerText;
-        total += parseFloat(subtotal);
-
-        detalleVenta.innerHTML += `
-            <tr>
-                <td>${descripcion}</td>
-                <td>${cantidad}</td>
-                <td>${precioUnitario}</td>
-                <td>${subtotal}</td>
-            </tr>
-        `;
-    });
-
-    document.getElementById('total_boleta').innerText = total.toFixed(2);
-
-    // Llamar a la función de impresión
-    imprimirBoleta();
-}
-document.getElementById("rucInput").addEventListener('blur', function() {
-    const ruc = this.value.trim();
-
-    if (ruc.length > 0) {
-        fetch('/guardar_documento', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                tipoDocumento: 'factura',
-                ruc: ruc
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === 'RUC encontrado') {
-                // Autocompletar los campos con los datos obtenidos
-                document.getElementById('razonSocialInput').value = data.razonSocial;
-                document.getElementById('direccionInput').value = data.direccion;
-            } else {
-                // Mostrar un mensaje si el RUC no está registrado
-                alert('El RUC no está registrado en la base de datos.');
+function agregarEventosCantidad() {
+    document.querySelectorAll(".cantidadInput").forEach(input => {
+        input.addEventListener("change", function () {
+            let cantidad = parseInt(this.value);
+            if (isNaN(cantidad) || cantidad < 1) {
+                this.value = 1;
+                cantidad = 1;
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
+
+            let fila = this.closest("tr");
+            let precioUnitario = parseFloat(fila.cells[3].textContent); // Ahora la columna de precio unitario es la [3]
+            fila.cells[5].textContent = (cantidad * precioUnitario).toFixed(2); // Ahora la columna de subtotal es la [5]
+            actualizarTotal();
         });
+    });
+}
+
+function eliminarFila(boton) {
+    let fila = boton.parentNode.parentNode;
+    fila.remove();
+    actualizarTotal();
+}
+
+function actualizarTotal() {
+    let total = 0;
+    document.querySelectorAll("#tablaProductos tbody tr").forEach(fila => {
+        total += parseFloat(fila.cells[5].textContent); // Ahora la columna de subtotal es la [5]
+    });
+    document.getElementById("totalVenta").value = total.toFixed(2);
+}
+
+document.getElementById("btnAgregarProducto").addEventListener("click", function () {
+    const select = document.getElementById("listaProductos");
+    const codigoBarras = select.value;
+
+    if (codigoBarras) {
+        buscarProducto(codigoBarras);
+    } else {
+        toastr.info("Seleccione un producto antes de agregar.");
     }
 });
 
-// Función para confirmar eliminación de una venta
-async function eliminarVenta(ventaId) {
-    try {
-        const response = await fetch(`/api/venta/desactivar/${ventaId}`, { method: 'POST' }); // URL de API para eliminar venta
-        if (response.ok) {
-            $('#tablaVentas').DataTable().ajax.reload();
-            $('#confirmarEliminarModal').modal('hide');
+document.addEventListener("DOMContentLoaded", () => {
+    const selectProductos = document.getElementById("listaProductos");
+    const inputBuscador = document.getElementById("buscadorProducto");
+    let productos = [];
+
+    // Función para cargar los productos desde la API
+    async function cargarProductos() {
+        try {
+            const response = await fetch("/api/producto/getAll");
+            const data = await response.json();
+            if (data && data.data) {
+                productos = data.data;
+                renderizarProductos(productos);
+            } else {
+                selectProductos.innerHTML = '<option disabled>No hay productos disponibles</option>';
+            }
+        } catch (error) {
+            console.error("Error al cargar productos:", error);
+            selectProductos.innerHTML = '<option disabled>Error al cargar productos</option>';
+        }
+    }
+
+    // Renderiza los productos en el select
+    function renderizarProductos(lista) {
+        selectProductos.innerHTML = lista.length
+            ? lista.map(p => `<option value="${p.CodigoBarras}">${p.Descripcion} (${p.SubCategoria})</option>`).join("")
+            : '<option disabled>No se encontraron productos</option>';
+    }
+
+    // Filtra la lista en tiempo real
+    inputBuscador.addEventListener("input", function () {
+        const filtro = this.value.toLowerCase();
+        const productosFiltrados = productos.filter(p => 
+            p.Descripcion.toLowerCase().includes(filtro) || 
+            p.SubCategoria.toLowerCase().includes(filtro)  // Ahora también filtra por subcategoría
+        );
+        renderizarProductos(productosFiltrados);
+    });
+
+    cargarProductos();
+
+    const codigoRadio = document.getElementById("option_codigo");
+    const productoRadio = document.getElementById("option_producto");
+    const codigoForm = document.getElementById("codigoForm");
+    const productoForm = document.getElementById("productoForm");
+
+    function toggleProductoForm() {
+        if (codigoRadio.checked) {
+            codigoForm.classList.remove("d-none");
+            productoForm.classList.add("d-none");
         } else {
-            alert("Error al eliminar la venta.");
+            codigoForm.classList.add("d-none");
+            productoForm.classList.remove("d-none");
+        }
+    }
+
+    // Asegurar que "Código" esté seleccionado por defecto
+    codigoRadio.checked = true;
+    toggleProductoForm();
+
+    codigoRadio.addEventListener("change", toggleProductoForm);
+    productoRadio.addEventListener("change", toggleProductoForm);
+
+    // 2. Manejo de selección de documento (Boleta / Factura)
+    const boletaRadio = document.getElementById("option_boleta");
+    const facturaRadio = document.getElementById("option_factura");
+    const boletaForm = document.getElementById("boletaForm");
+    const facturaForm = document.getElementById("facturaForm");
+
+    function toggleDocumentoForm() {
+        if (boletaRadio.checked) {
+            boletaForm.classList.remove("d-none");
+            facturaForm.classList.add("d-none");
+        } else {
+            boletaForm.classList.add("d-none");
+            facturaForm.classList.remove("d-none");
+        }
+    }
+
+    // Asegurar que "Boleta" esté seleccionado por defecto
+    boletaRadio.checked = true;
+    toggleDocumentoForm();
+
+    boletaRadio.addEventListener("change", toggleDocumentoForm);
+    facturaRadio.addEventListener("change", toggleDocumentoForm);
+
+    const efectivoRadio = document.getElementById("option_efectivo");
+    const tarjetaRadio = document.getElementById("option_tarjeta");
+    const yapeRadio = document.getElementById("option_yape");
+    const plinRadio = document.getElementById("option_plin");
+
+    // Obtener los formularios
+    const efectivoForm = document.getElementById("efectivoForm");
+    const tarjetaForm = document.getElementById("tarjetaForm");
+    const yapeForm = document.getElementById("yapeForm");
+    const plinForm = document.getElementById("plinForm");
+
+    function togglePagoForm() {
+        efectivoForm.classList.add("d-none");
+        tarjetaForm.classList.add("d-none");
+        yapeForm.classList.add("d-none");
+        plinForm.classList.add("d-none");
+
+        if (efectivoRadio.checked) {
+            efectivoForm.classList.remove("d-none");
+        } else if (tarjetaRadio.checked) {
+            tarjetaForm.classList.remove("d-none");
+        } else if (yapeRadio.checked) {
+            yapeForm.classList.remove("d-none");
+        } else if (plinRadio.checked) {
+            plinForm.classList.remove("d-none");
+        }
+    }
+
+    // Asegurar que "Efectivo" esté seleccionado por defecto
+    efectivoRadio.checked = true;
+    togglePagoForm();
+
+    // Agregar eventos de cambio
+    efectivoRadio.addEventListener("change", togglePagoForm);
+    tarjetaRadio.addEventListener("change", togglePagoForm);
+    yapeRadio.addEventListener("change", togglePagoForm);
+    plinRadio.addEventListener("change", togglePagoForm);
+
+    // Calcular vuelto automáticamente
+    document.getElementById("montoEntregado").addEventListener("input", function () {
+        let montoEntregado = parseFloat(this.value) || 0;
+        let totalAPagar = document.getElementById("totalVenta").value
+        let vuelto = montoEntregado - totalAPagar;
+        document.getElementById("vuelto").value = vuelto >= 0 ? vuelto.toFixed(2) : 0;
+    });
+
+    const dniInput = document.getElementById("dni");
+    const nombreInput = document.getElementById("nombre");
+    const rucInput = document.getElementById("ruc");
+    const razonSocialInput = document.getElementById("razonSocial");
+    const direccionInput = document.getElementById("direccion");
+
+    // Función para obtener datos de la API
+    async function fetchData(tipo, numero) {
+        try {
+            const response = await fetch("/api/venta/getDataSunat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ tipo, numero })
+            });
+
+            const data = await response.json();
+            return data.success ? data : null;
+        } catch (error) {
+            console.error("Error al obtener datos:", error);
+            return null;
+        }
+    }
+
+    // Evento para el campo DNI
+    dniInput.addEventListener("keydown", async function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();  // Evita que se envíe un formulario por accidente
+            const dni = dniInput.value.trim();
+            if (dni.length === 8) {  
+                const data = await fetchData("dni", dni);
+                if (data) {
+                    nombreInput.value = data.nombre || "";
+                }
+            }
+        }
+    });
+    
+    rucInput.addEventListener("keydown", async function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            const ruc = rucInput.value.trim();
+            if (ruc.length === 11) {  
+                const data = await fetchData("ruc", ruc);
+                if (data) {
+                    razonSocialInput.value = data.razonSocial || "";
+                    direccionInput.value = data.direccion || "";
+                }
+            }
+        }
+    });
+});
+
+document.getElementById("btnConfirmarPago").addEventListener("click", async function () {
+    // Obtener el ID del empleado (puedes cambiar esto según tu lógica)
+
+    // Obtener tipo de venta
+    const tipoVenta = document.querySelector('input[name="tipo_venta"]:checked')?.id === "option_boleta" ? "boleta" : "factura";
+    console.log("Tipo de venta seleccionado:", tipoVenta);
+
+
+    // Obtener datos del documento de venta
+    let datosDocumentoVenta = {};
+    if (tipoVenta === "boleta") {
+        const dni = document.getElementById("dni").value.trim();
+        const nombre = document.getElementById("nombre").value.trim();
+        datosDocumentoVenta = {
+            DNI: dni || null,
+            Nombre: nombre || null
+        };
+    } else {
+        const ruc = document.getElementById("ruc").value.trim();
+        const razonSocial = document.getElementById("razonSocial").value.trim();
+        const direccion = document.getElementById("direccion").value.trim();
+        
+        if (!ruc || !razonSocial || !direccion) {
+            toastr.info("Todos los campos para factura son obligatorios.");
+            return;
+        }
+
+        datosDocumentoVenta = {
+            RUC: ruc,
+            Razon_Social: razonSocial,
+            Direccion: direccion
+        };
+    }
+
+    // Obtener tipo de pago
+    let tipoPago = "";
+    let datosPago = {};
+    if (document.getElementById("option_efectivo").checked) {
+        tipoPago = "efectivo";
+        const montoEntregado = parseFloat(document.getElementById("montoEntregado").value);
+        const vuelto = parseFloat(document.getElementById("vuelto").value);
+        datosPago = { MontoEntregado: montoEntregado, Vuelto: vuelto };
+    } else if (document.getElementById("option_tarjeta").checked) {
+        tipoPago = "tarjeta";
+        const numeroTransferencia = document.getElementById("numeroTransferencia").value.trim();
+        datosPago = { NumeroTransferencia: numeroTransferencia };
+    } else if (document.getElementById("option_yape").checked) {
+        tipoPago = "yape";
+        const numeroYape = document.getElementById("numeroYape").value.trim();
+        datosPago = { NumeroCelular: numeroYape };
+    } else if (document.getElementById("option_plin").checked) {
+        tipoPago = "plin";
+        const numeroPlin = document.getElementById("numeroPlin").value.trim();
+        datosPago = { NumeroCelular: numeroPlin };
+    }
+
+    if (!tipoPago || Object.keys(datosPago).length === 0) {
+        toastr.info("Debe seleccionar y completar el método de pago.");
+        return;
+    }
+
+    // Obtener productos de la tabla
+    const tabla = document.getElementById("tablaProductos").getElementsByTagName("tbody")[0];
+    const filas = tabla.getElementsByTagName("tr");
+    const detalles = [];
+
+    for (let fila of filas) {
+        const productoID = parseInt(fila.cells[0].textContent);
+        const cantidad = fila.querySelector(".cantidadInput").value;
+        const precioUnitario = parseFloat(fila.cells[3].textContent);
+
+        detalles.push({
+            Producto_ID: parseInt(productoID),
+            Cantidad: parseInt(cantidad),
+            PrecioUnitario: precioUnitario
+        });
+    }
+
+    if (detalles.length === 0) {
+        toastr.info("Debe agregar al menos un producto.");
+        return;
+    }
+
+    // Construir objeto de venta
+    const ventaData = {
+        TipoVenta: tipoVenta,
+        DatosDocumentoVenta: datosDocumentoVenta,
+        TipoPago: tipoPago,
+        DatosPago: datosPago,
+        Detalles: detalles
+    };
+
+    //console.log("Datos a enviar:", ventaData);
+
+    try {
+        const response = await fetch("/api/venta/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(ventaData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            toastr.success("Venta registrada exitosamente.");
+            enviarVentaAlServidor(result.Venta_ID);
+            limpiarFormulario();
+        } else {
+            toastr.error("Error al registrar la venta: " + result.message);
         }
     } catch (error) {
-        console.error("Error al eliminar venta:", error);
+        toastr.error("Error en la conexión con el servidor.");
+        console.error(error);
+    }
+});
+
+function limpiarFormulario() {
+    // Limpiar inputs
+    document.getElementById("dni").value = "";
+    document.getElementById("nombre").value = "";
+    document.getElementById("ruc").value = "";
+    document.getElementById("razonSocial").value = "";
+    document.getElementById("direccion").value = "";
+    document.getElementById("montoEntregado").value = "";
+    document.getElementById("vuelto").value = "";
+    document.getElementById("numeroTransferencia").value = "";
+    document.getElementById("numeroYape").value = "";
+    document.getElementById("numeroPlin").value = "";
+
+    // Limpiar tabla de productos
+    const tabla = document.getElementById("tablaProductos").getElementsByTagName("tbody")[0];
+    tabla.innerHTML = "";
+
+    // Reiniciar tipo de venta a boleta
+    document.getElementById("option_boleta").checked = true;
+
+    // Reiniciar método de pago a efectivo
+    document.getElementById("option_efectivo").checked = true;
+
+    // Reiniciar total de venta
+    document.getElementById("totalVenta").value = "0.00";
+}
+
+async function enviarVentaAlServidor(ventaID) {
+    try {
+        const response = await fetch(`/api/venta/savePdf/${ventaID}`, {  // Cambié la petición a GET con el ID en la URL
+            method: 'GET',  // Usamos GET en lugar de POST
+            headers: { 'Content-Type': 'application/json' }  // Opcional, pero puedes dejarlo si es necesario
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            window.open(data.pdf_url, '_blank'); // Abrir el PDF en una nueva pestaña
+        } else {
+            console.error("Error al generar el PDF:", data.message);
+        }
+    } catch (error) {
+        console.error("Error en la petición:", error);
     }
 }
 
-// Función principal para manejar eventos y lógica
-async function main() {
-    let ventaId = null;
+// Agregar escucha de eventos para teclas F1, F2, F3, F4
+// document.addEventListener('keydown', (event) => {
+//     if (event.key === 'e' || event.key === 'E') {
+//         metodoPagoSelect.value = 'efectivo';
+//         metodoPagoSelect.dispatchEvent(new Event('change')); // Trigger the change event to update payment details
+//     } else if (event.key === 't' || event.key === 'T') {
+//         metodoPagoSelect.value = 'tarjeta';
+//         metodoPagoSelect.dispatchEvent(new Event('change'));
+//     } else if (event.key === 'y' || event.key === 'Y') {
+//         metodoPagoSelect.value = 'yape';
+//         metodoPagoSelect.dispatchEvent(new Event('change'));
+//     } else if (event.key === 'p' || event.key === 'P') {
+//         metodoPagoSelect.value = 'plin';
+//         metodoPagoSelect.dispatchEvent(new Event('change'));
+//     }
+// });
 
-    // Inicializar la tabla
-    inicializarTablaVentas();
 
-    // Evento para abrir detalles de venta
-    $(document).on('click', '.detallesBtn', function () {
-        ventaId = $(this).data('id');
-        limpiarModalDetalles();
-        mostrarDetallesVenta(ventaId);
-    });
-
-    // Evento para abrir el modal de confirmación de eliminación
-    $(document).on('click', '.eliminarBtn', function () {
-        ventaId = $(this).data('id');
-        $('#confirmarEliminarModal').modal('show');
-    });
-
-    // Confirmar eliminación
-    $('#confirmarEliminar').click(function () {
-        eliminarVenta(ventaId);
-    });
-
-    // Evento para cerrar modales
-    $(document).on('click', '.cerrarBtn', function () {
-        $('#Modal').modal('hide');
-        $('#confirmarEliminarModal').modal('hide');
-    });
-}
-
-// Ejecutar la función principal cuando el documento esté listo
-$(document).ready(main);

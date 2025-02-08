@@ -1,9 +1,0 @@
-.tabla-scroll {
-    max-height: 300px; /* Ajusta la altura máxima según tu diseño */
-    overflow-y: auto; /* Habilita el desplazamiento vertical */
-    border: 1px solid #ddd; /* Opcional: agrega un borde alrededor del contenedor */
-}
-
-.tabla-scroll table {
-    width: 100%; /* Asegura que la tabla ocupe todo el ancho del contenedor */
-}
