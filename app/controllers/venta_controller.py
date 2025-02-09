@@ -83,6 +83,59 @@ def getAll():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Obtener todas las ventas desacrivadas
+@venta.route('/getAllDesactivadas', methods=['GET'])
+@login_required
+def getAllDesactivadas():
+    try:
+        ventas = Venta.query.filter_by(Estado=0).all()  # Filtra solo ventas activas
+        result = []
+
+        for venta in ventas:  # Itera sobre cada venta
+            # Verificar si tiene Cliente_ID
+            if venta.Cliente_ID is not None:
+                result.append({
+                    "Venta_ID": venta.Venta_ID,
+                    "Comprador": venta.cliente.Nombre,
+                    "NumDoc": venta.cliente.NumDoc,
+                    "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                    "FechaVenta": venta.FechaVenta.isoformat(),
+                    "TipoVenta": venta.TipoVenta,
+                    "TipoPago": venta.TipoPago,
+                    "Total": venta.Total,
+                    "Estado": venta.Estado
+                })
+            else:
+                # Dependiendo del tipo de venta, se maneja diferente
+                if venta.TipoVenta.upper() == "BOLETA":
+                    result.append({
+                        "Venta_ID": venta.Venta_ID,
+                        "Comprador": venta.DatosDocumentoVenta["Nombre"],
+                        "NumDoc": venta.DatosDocumentoVenta["DNI"],
+                        "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                        "FechaVenta": venta.FechaVenta.isoformat(),
+                        "TipoVenta": venta.TipoVenta,
+                        "TipoPago": venta.TipoPago,
+                        "Total": venta.Total,
+                        "Estado": venta.Estado
+                    })
+                elif venta.TipoVenta.upper() == "FACTURA":
+                    result.append({
+                        "Venta_ID": venta.Venta_ID,
+                        "Comprador": venta.DatosDocumentoVenta["Razon_Social"],
+                        "NumDoc": venta.DatosDocumentoVenta["RUC"],
+                        "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                        "FechaVenta": venta.FechaVenta.isoformat(),
+                        "TipoVenta": venta.TipoVenta,
+                        "TipoPago": venta.TipoPago,
+                        "Total": venta.Total,
+                        "Estado": venta.Estado
+                    })
+
+        return jsonify({"success": True, "data": result}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @venta.route('/getId/<int:Venta_ID>', methods=['GET'])
 @login_required
 def getId(Venta_ID):
@@ -181,6 +234,20 @@ def desactivar(venta_id):
         venta.Estado = 0  # Cambia el estado a inactivo
         db.session.commit()
         return jsonify({"success": True, "message": "Venta desactivada correctamente"}), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+@venta.route('/activar/<int:venta_id>', methods=['POST'])
+@login_required
+def activar(venta_id):
+    try:
+        venta = Venta.query.get(venta_id)
+        if not venta:
+            return jsonify({"success": False, "message": "Venta no encontrada"}), 404
+        
+        venta.Estado = 1  # Cambia el estado a inactivo
+        db.session.commit()
+        return jsonify({"success": True, "message": "Venta activada correctamente"}), 200
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
     

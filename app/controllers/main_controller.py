@@ -50,6 +50,12 @@ def roles():
     permisos = session.get('permisos', 'guest')
     return render_template('roles.html', permisos=permisos)
 
+@main_bp.route('/recuperarVentas')
+@login_required
+def recuperarVentas():
+    permisos = session.get('permisos', 'guest')
+    return render_template('recuperarVentas.html', permisos=permisos)
+
 @main_bp.route('/acceso_denegado')
 def acceso_denegado():
     return render_template('acceso_denegado.html')
