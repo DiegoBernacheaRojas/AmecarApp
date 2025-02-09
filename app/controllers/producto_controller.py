@@ -6,7 +6,7 @@ from ..utils import login_required
 producto = Blueprint('producto', __name__)
 
 @producto.route('/getAll', methods=['GET'])
-@login_required('Gerente','Empleado')
+@login_required
 def getAll():
     try:
         productos = Producto.query.filter_by(Estado=True).all()
@@ -36,7 +36,7 @@ def getAll():
         }), 500
 
 @producto.route('/getId/<int:Producto_ID>', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getId(Producto_ID):
     try:
         producto = Producto.query.get(Producto_ID)
@@ -63,7 +63,7 @@ def getId(Producto_ID):
         }), 500
 
 @producto.route('/register', methods=['POST'])
-@login_required('Gerente')
+@login_required
 def register():
     try:
         data = request.get_json()
@@ -92,7 +92,7 @@ def register():
         }), 500
 
 @producto.route('/update/<int:Producto_ID>', methods=['PUT'])
-@login_required('Gerente')
+@login_required
 def update(Producto_ID):
     try:
         data = request.get_json()
@@ -114,7 +114,7 @@ def update(Producto_ID):
         return jsonify({"success": False, "message": str(e)}), 500
 
 @producto.route('/delete/<int:Producto_ID>', methods=['DELETE'])
-@login_required('Gerente')
+@login_required
 def delete(Producto_ID):
     try:
         producto = Producto.query.get(Producto_ID)
@@ -128,7 +128,7 @@ def delete(Producto_ID):
         return jsonify({"success": False, "message": str(e)}), 500
 
 @producto.route('/desactivar/<int:Producto_ID>', methods=['POST'])
-@login_required('Gerente')
+@login_required
 def desactivar(Producto_ID):
     try:
         producto = Producto.query.get(Producto_ID)
@@ -156,7 +156,7 @@ def desactivar(Producto_ID):
         }), 500
     
 @producto.route('/getCodBarras', methods=['POST'])
-@login_required('Gerente','Empleado')
+@login_required
 def getCodBarras():
     # Obtener el código de barras enviado en el cuerpo de la solicitud
     data = request.get_json()

@@ -1,6 +1,7 @@
 from app import db
 from sqlalchemy import text
 from sqlalchemy.dialects.mysql import JSON
+import json
 
 class Categoria(db.Model):
     __tablename__ = 'Categoria'
@@ -103,9 +104,17 @@ class Rol(db.Model):
     Rol_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Nombre = db.Column(db.String(50), nullable=False)
     Estado = db.Column(db.Boolean, nullable=False)
-
-    # Relación con Empleado
+    Permisos = db.Column(db.Text, nullable=False)
+    
+    # Relación con empleados
     empleados = db.relationship('Empleado', backref='rol', lazy=True)
+    
+    # Método auxiliar para obtener los permisos como lista
+    def get_permisos(self):
+        try:
+            return json.loads(self.Permisos)
+        except Exception:
+            return []
 
 
 class Empleado(db.Model):

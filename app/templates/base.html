@@ -80,7 +80,7 @@
             </a>
           </li>
           <li class="nav-item">
-            {% if 'productos' in permisos or 'clientes' in permisos or 'empleados' in permisos %}
+            {% if 'productos' in permisos or 'clientes' in permisos or 'empleados' in permisos or 'roles' in permisos%}
             <a href="#" class="nav-link">
               <i class="far nav-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-fill-gear" viewBox="0 0 16 16">
@@ -130,11 +130,24 @@
                 </a>
               </li>
               {% endif %}
+              {% if 'roles' in permisos %}
+              <li class="nav-item">
+                <a href="/roles" class="nav-link">
+                  <i class="far nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                      <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                      <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                    </svg>
+                  </i>
+                  <p>Roles</p>
+                </a>
+              </li>
+              {% endif %}
             </ul>
             {% endif %}
           </li>
           <li class="nav-item">
-            {% if 'ventas' in permisos or 'detalleventa' in permisos %}
+            {% if 'ventas' in permisos or 'detalleVentas' in permisos %}
             <a href="#" class="nav-link">
               <i class="nav-icon fas">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-tags-fill" viewBox="0 0 16 16">
@@ -243,6 +256,8 @@
 <script src="../static/dist/js/demo.js"></script>
 <!-- Toastr -->
 <script src="../static/plugins/toastr/toastr.min.js"></script>
+<!-- Bootstrap Switch -->
+<script src="../static/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 
 <!-- Script para funciones que usen en cada pagina --> 
 <script src="../static/js/base.js"></script>

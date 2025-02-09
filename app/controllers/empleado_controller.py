@@ -6,7 +6,7 @@ from ..utils import login_required
 empleado = Blueprint('empleado', __name__)
 
 @empleado.route('/getAll', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getAll():
     try:
         empleados = Empleado.query.filter_by(Estado=True).all()
@@ -39,7 +39,7 @@ def getAll():
         }), 500
 
 @empleado.route('/getId/<int:Empleado_ID>', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getId(Empleado_ID):
     try:
         empleado = Empleado.query.get(Empleado_ID)
@@ -73,7 +73,7 @@ def getId(Empleado_ID):
         }), 500
 
 @empleado.route('/register', methods=['POST'])
-@login_required('Gerente')
+@login_required
 def register():
     try:
         data = request.get_json()
@@ -109,7 +109,7 @@ def register():
         }), 500
 
 @empleado.route('/update/<int:Empleado_ID>', methods=['PUT'])
-@login_required('Gerente')
+@login_required
 def update(Empleado_ID):
     try:
         data = request.get_json()
@@ -138,7 +138,7 @@ def update(Empleado_ID):
         return jsonify({"success": False, "message": "Error al actualizar el empleado.", "error": str(e)}), 500
 
 @empleado.route('/delete/<int:Empleado_ID>', methods=['DELETE'])
-@login_required('Gerente')
+@login_required
 def delete(Empleado_ID):
     try:
         empleado = Empleado.query.get(Empleado_ID)
@@ -152,7 +152,7 @@ def delete(Empleado_ID):
         return jsonify({"success": False, "message": str(e)}), 500
 
 @empleado.route('/desactivar/<int:Empleado_ID>', methods=['POST'])
-@login_required('Gerente')
+@login_required
 def desactivar(Empleado_ID):
     try:
         empleado = Empleado.query.get(Empleado_ID)

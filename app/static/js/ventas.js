@@ -261,6 +261,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const direccionInput = document.getElementById("direccion");
 
     // Función para obtener datos de la API
+    async function fetchCliente(tipo, numero) {
+        try {
+            const response = await fetch("/api/cliente/getRucODni", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ tipo, numero })
+            });
+    
+            const data = await response.json();
+            if (data.success) {
+                return data; // Retorna los datos del cliente si se encuentra
+            } else {
+                return null; // Retorna null si no se encuentra el cliente
+            }
+        } catch (error) {
+            console.error("Error al obtener datos del cliente:", error);
+            return null;
+        }
+    }
+    
+    // Función para buscar datos en SUNAT
     async function fetchData(tipo, numero) {
         try {
             const response = await fetch("/api/venta/getDataSunat", {
@@ -270,38 +293,56 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 body: JSON.stringify({ tipo, numero })
             });
-
+    
             const data = await response.json();
             return data.success ? data : null;
         } catch (error) {
-            console.error("Error al obtener datos:", error);
+            console.error("Error al obtener datos de SUNAT:", error);
             return null;
         }
     }
-
+    
     // Evento para el campo DNI
     dniInput.addEventListener("keydown", async function (event) {
         if (event.key === "Enter") {
             event.preventDefault();  // Evita que se envíe un formulario por accidente
             const dni = dniInput.value.trim();
             if (dni.length === 8) {  
-                const data = await fetchData("dni", dni);
-                if (data) {
-                    nombreInput.value = data.nombre || "";
+                // Primero buscar en la base de datos si el DNI ya está registrado
+                const clienteData = await fetchCliente("dni", dni);
+                if (clienteData) {
+                    // Si el cliente está registrado, utiliza el nombre del cliente
+                    nombreInput.value = clienteData.Nombre || "";
+                } else {
+                    // Si no está registrado, buscar en SUNAT
+                    const data = await fetchData("dni", dni);
+                    if (data) {
+                        nombreInput.value = data.nombre || "";
+                    }
                 }
             }
         }
     });
     
+    // Evento para el campo RUC
     rucInput.addEventListener("keydown", async function (event) {
         if (event.key === "Enter") {
             event.preventDefault();
             const ruc = rucInput.value.trim();
             if (ruc.length === 11) {  
-                const data = await fetchData("ruc", ruc);
-                if (data) {
-                    razonSocialInput.value = data.razonSocial || "";
-                    direccionInput.value = data.direccion || "";
+                // Primero buscar en la base de datos si el RUC ya está registrado
+                const clienteData = await fetchCliente("ruc", ruc);
+                if (clienteData) {
+                    // Si el cliente está registrado, utiliza la razón social
+                    razonSocialInput.value = clienteData.Nombre || ""; // Aquí se usa Nombre, pero podría ser otro campo
+                    direccionInput.value = clienteData.Direccion || "";
+                } else {
+                    // Si no está registrado, buscar en SUNAT
+                    const data = await fetchData("ruc", ruc);
+                    if (data) {
+                        razonSocialInput.value = data.razonSocial || "";
+                        direccionInput.value = data.direccion || "";
+                    }
                 }
             }
         }
@@ -348,27 +389,43 @@ document.getElementById("btnConfirmarPago").addEventListener("click", async func
     if (document.getElementById("option_efectivo").checked) {
         tipoPago = "efectivo";
         const montoEntregado = parseFloat(document.getElementById("montoEntregado").value);
-        const vuelto = parseFloat(document.getElementById("vuelto").value);
+        // Validar que el monto entregado sea un número positivo
+        if (isNaN(montoEntregado) || montoEntregado <= 0) {
+            toastr.info("Ingrese un monto válido en efectivo.");
+            return;
+        }
+        // Se puede calcular el vuelto o usar un valor predeterminado (0 si no se ingresa)
+        const vuelto = parseFloat(document.getElementById("vuelto").value) || 0;
         datosPago = { MontoEntregado: montoEntregado, Vuelto: vuelto };
+    
     } else if (document.getElementById("option_tarjeta").checked) {
         tipoPago = "tarjeta";
         const numeroTransferencia = document.getElementById("numeroTransferencia").value.trim();
+        if (!numeroTransferencia) {
+            toastr.info("Ingrese el número de transferencia.");
+            return;
+        }
         datosPago = { NumeroTransferencia: numeroTransferencia };
+    
     } else if (document.getElementById("option_yape").checked) {
         tipoPago = "yape";
         const numeroYape = document.getElementById("numeroYape").value.trim();
+        if (!numeroYape) {
+            toastr.info("Ingrese el número de celular para Yape.");
+            return;
+        }
         datosPago = { NumeroCelular: numeroYape };
+    
     } else if (document.getElementById("option_plin").checked) {
         tipoPago = "plin";
         const numeroPlin = document.getElementById("numeroPlin").value.trim();
+        if (!numeroPlin) {
+            toastr.info("Ingrese el número de celular para Plin.");
+            return;
+        }
         datosPago = { NumeroCelular: numeroPlin };
     }
-
-    if (!tipoPago || Object.keys(datosPago).length === 0) {
-        toastr.info("Debe seleccionar y completar el método de pago.");
-        return;
-    }
-
+    
     // Obtener productos de la tabla
     const tabla = document.getElementById("tablaProductos").getElementsByTagName("tbody")[0];
     const filas = tabla.getElementsByTagName("tr");
@@ -442,12 +499,6 @@ function limpiarFormulario() {
     // Limpiar tabla de productos
     const tabla = document.getElementById("tablaProductos").getElementsByTagName("tbody")[0];
     tabla.innerHTML = "";
-
-    // Reiniciar tipo de venta a boleta
-    document.getElementById("option_boleta").checked = true;
-
-    // Reiniciar método de pago a efectivo
-    document.getElementById("option_efectivo").checked = true;
 
     // Reiniciar total de venta
     document.getElementById("totalVenta").value = "0.00";

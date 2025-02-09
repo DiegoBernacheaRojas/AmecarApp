@@ -7,7 +7,7 @@ from ..utils import login_required
 cliente = Blueprint('cliente', __name__)
 
 @cliente.route('/getId/<int:Cliente_ID>', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getId(Cliente_ID):
     try:
         # Buscar el cliente por su ID
@@ -48,7 +48,7 @@ def getId(Cliente_ID):
         }), 500
 
 @cliente.route('/getAll', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getAll():
     try:
         # Obtener solo los clientes activos
@@ -92,7 +92,7 @@ def getAll():
         }), 500
 
 @cliente.route('/register', methods=['POST'])
-@login_required('Gerente')
+@login_required
 def register():
     try:
         data = request.get_json()
@@ -130,7 +130,7 @@ def register():
         }), 500
 
 @cliente.route('/update/<int:Cliente_ID>', methods=['PUT'])
-@login_required('Gerente')
+@login_required
 def update(Cliente_ID):
     try:
         cliente = Cliente.query.get(Cliente_ID)
@@ -172,7 +172,7 @@ def update(Cliente_ID):
         }), 500
 
 @cliente.route('/delete/<int:Cliente_ID>', methods=['DELETE'])
-@login_required('Gerente')
+@login_required
 def delete(Cliente_ID):
     try:
         cliente = Cliente.query.get(Cliente_ID)
@@ -200,7 +200,7 @@ def delete(Cliente_ID):
         }), 500
 
 @cliente.route('/desactivar/<int:Cliente_ID>', methods=['POST'])
-@login_required('Gerente')
+@login_required
 def desactivar(Cliente_ID):
     try:
         cliente = Cliente.query.get(Cliente_ID)
@@ -228,7 +228,7 @@ def desactivar(Cliente_ID):
         }), 500
     
 @cliente.route('/getRucODni', methods=['POST'])
-@login_required('Gerente', 'Empleado')
+@login_required
 def getRucODni():
     data = request.get_json()
     

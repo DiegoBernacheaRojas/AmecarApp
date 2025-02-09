@@ -6,7 +6,7 @@ from ..utils import login_required
 tipo_documento = Blueprint('tipo_documento', __name__)
 
 @tipo_documento.route('/getAll', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getAll():
     try:
         # Obtener todos los clientes

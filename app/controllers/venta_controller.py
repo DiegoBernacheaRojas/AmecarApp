@@ -32,7 +32,7 @@ if not os.path.exists(PDF_FOLDER):
 
 # Obtener todas las ventas activas
 @venta.route('/getAll', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getAll():
     try:
         ventas = Venta.query.filter_by(Estado=1).all()  # Filtra solo ventas activas
@@ -84,7 +84,7 @@ def getAll():
         return jsonify({"error": str(e)}), 500
 
 @venta.route('/getId/<int:Venta_ID>', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getId(Venta_ID):
     try:
         # Obtener la venta principal
@@ -157,7 +157,7 @@ def getId(Venta_ID):
         return jsonify({"success": False, "message": str(e)}), 500
     
 @venta.route('/delete/<int:Venta_ID>', methods=['DELETE'])
-@login_required('Gerente')
+@login_required
 def delete(venta_id):
     try:
         venta = Venta.query.get(venta_id)
@@ -171,7 +171,7 @@ def delete(venta_id):
         return jsonify({"success": False, "message": str(e)}), 500
 
 @venta.route('/desactivar/<int:venta_id>', methods=['POST'])
-@login_required('Gerente')
+@login_required
 def desactivar(venta_id):
     try:
         venta = Venta.query.get(venta_id)
@@ -185,7 +185,7 @@ def desactivar(venta_id):
         return jsonify({"success": False, "message": str(e)}), 500
     
 @venta.route('/getDataSunat', methods=['POST'])
-@login_required('Gerente','Empleado')
+@login_required
 def getDataSunat():
     data = request.get_json()
 
@@ -241,7 +241,7 @@ def getDataSunat():
         return jsonify({"success": False, "message": "Error al conectar con la API", "error": str(e)}), 500
     
 @venta.route('/register', methods=['POST'])
-@login_required('Gerente', 'Empleado')
+@login_required
 def register():
     try:
         data = request.get_json()
@@ -344,7 +344,7 @@ def serve_pdf(filename):
     return send_from_directory(PDF_FOLDER, filename)
 
 @venta.route('/savePdf/<int:idVenta>', methods=['GET'])
-@login_required('Gerente', 'Empleado')
+@login_required
 def save_pdf(idVenta):
     # Consultar la venta en la base de datos
     venta = Venta.query.get(idVenta)
@@ -381,9 +381,8 @@ def save_pdf(idVenta):
             dividir_texto(f"Nombre: {venta.cliente.Nombre}")
             dividir_texto(f"{venta.cliente.tipo_documento.Nombre}: {venta.cliente.NumDoc}")
         else:  # FACTURA
-            result = getDataSunat(venta.cliente.NumDoc)
-            dividir_texto(f"Razon social: {result['razonSocial']}")
-            dividir_texto(f"Dirección: {result['direccion']}")
+            dividir_texto(f"Razon social: {venta.cliente.Nombre}")
+            dividir_texto(f"Dirección: {venta.cliente.Direccion}")
             dividir_texto(f"RUC: {venta.cliente.NumDoc}")
     else:
         if venta.TipoVenta.upper() == "BOLETA":

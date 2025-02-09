@@ -34,9 +34,14 @@ def post_login():
         }), 200
 
     # Guardar la sesión
+    rol = empleado.rol  # Gracias a la relación backref 'rol'
+    permisos = rol.get_permisos()  # Devuelve la lista de permisos
+    
+    # Guardar la información en la sesión
     session['user_id'] = empleado.Empleado_ID
-    session['rol'] = empleado.rol.Nombre
-
+    session['rol'] = rol.Nombre
+    session['permisos'] = permisos
+    print(f"Permisos del usuario: {session['permisos']}") 
 
     return jsonify({
         "success": True,
