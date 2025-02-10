@@ -56,6 +56,12 @@ def recuperarVentas():
     permisos = session.get('permisos', 'guest')
     return render_template('recuperarVentas.html', permisos=permisos)
 
+@main_bp.route('/reporteVentas')
+@login_required
+def reporteVentas():
+    permisos = session.get('permisos', 'guest')
+    return render_template('reporteVentas.html', permisos=permisos)
+
 @main_bp.route('/acceso_denegado')
 def acceso_denegado():
     return render_template('acceso_denegado.html')

@@ -1,6 +1,6 @@
 API_PERMISSIONS = {
     # APIs de cliente
-    "/api/cliente/getAll": ["clientes"],
+    "/api/cliente/getAll": ["clientes", "reporteVentas"],
     "/api/cliente/getId": ["clientes"],
     "/api/cliente/register": ["clientes"],
     "/api/cliente/update": ["clientes"],
@@ -12,7 +12,7 @@ API_PERMISSIONS = {
     "/api/distrito/getAll": ["clientes", "empleados"],
 
     # APIs de empleado
-    "/api/empleado/getAll": ["empleados"],
+    "/api/empleado/getAll": ["empleados","reporteVentas"],
     "/api/empleado/getId": ["empleados"],
     "/api/empleado/register": ["empleados"],
     "/api/empleado/update": ["empleados"],
@@ -28,9 +28,10 @@ API_PERMISSIONS = {
     "/empleados": ["empleados"],
     "/roles": ["roles"],
     "/recuperarVentas": ["recuperarVentas"],
+    "/reporteVentas": ["reporteVentas"],
 
     # APIs de producto
-    "/api/producto/getAll": ["productos", "ventas"],
+    "/api/producto/getAll": ["productos", "ventas", "reporteVentas"],
     "/api/producto/getId": ["productos"],
     "/api/producto/register": ["productos"],
     "/api/producto/update": ["productos"],
@@ -56,7 +57,7 @@ API_PERMISSIONS = {
 
     # APIs de venta
     "/api/venta/getAllDesactivadas": ["recuperarVentas"],
-    "/api/venta/getAll": ["detalleVentas"],
+    "/api/venta/getAll": ["detalleVentas", "reporteVentas"],
     "/api/venta/getId": ["detalleVentas"],
     "/api/venta/register": ["ventas"],
     "/api/venta/delete": None,  # Bloqueado
@@ -64,5 +65,7 @@ API_PERMISSIONS = {
     "/api/venta/activar": ["recuperarVentas"],
     "/api/venta/getDataSunat": ["ventas"],
     "/api/venta/savePdf": ["ventas"],
+    "/api/venta/getAllWithFilter": ["reporteVentas"],
+    "/api/venta/printPdf": ["reporteVentas"],
 
 }

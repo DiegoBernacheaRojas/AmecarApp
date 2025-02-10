@@ -1,4 +1,4 @@
-const modulos = ["roles","ventas", "productos", "detalleVentas", "clientes", "empleados", "home", "recuperarVentas"];
+const modulos = ["roles","ventas", "productos", "detalleVentas", "clientes", "empleados", "home", "recuperarVentas","reporteVentas"];
 
 // Definir nombres personalizados para ciertos módulos
 const modulosPersonalizados = {

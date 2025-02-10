@@ -1,281 +1,352 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{% block title %}Mi Sitio Web{% endblock %}</title>
+  <title>{% block title %}Mi Sitio Web{% endblock %}</title>
 
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="../static/plugins/fontawesome-free/css/all.min.css">
-    <!-- DataTables -->
-    <link rel="stylesheet" href="../static/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="../static/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="../static/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-    <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
-    <!-- DataTables Buttons -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="../static/dist/css/adminlte.min.css">
-    <!-- Toastr -->
-    <link rel="stylesheet" href="../static/plugins/toastr/toastr.min.css">
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../static/plugins/fontawesome-free/css/all.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="../static/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="../static/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+  <link rel="stylesheet" href="../static/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+  <!-- DataTables Buttons -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../static/dist/css/adminlte.min.css">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="../static/plugins/toastr/toastr.min.css">
+  <!-- iCheck for checkboxes and radio inputs -->
+  <link rel="stylesheet" href="../static/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="../static/plugins/select2/css/select2.min.css">
+  <link rel="stylesheet" href="../static/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
+  <div class="wrapper">
 
     <!-- Preloader -->
-  <!-- <div class="preloader flex-column justify-content-center align-items-center">
+    <!-- <div class="preloader flex-column justify-content-center align-items-center">
     <img class="animation__shake" src="../static/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="150" width="150">
   </div>-->
 
-  <!-- Navbar -->
-  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-      </li>
-    </ul>
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+      <!-- Left navbar links -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+      </ul>
 
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-      <li class="nav-item">
-        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-          <i class="fas fa-expand-arrows-alt"></i>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  <!-- /.navbar -->
+      <!-- Right navbar links -->
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+            <i class="fas fa-expand-arrows-alt"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
-    <a href="/index" class="brand-link">
-      <img src="../static/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">Amecar</span>
-    </a>
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="/index" class="brand-link">
+        <img src="../static/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+          style="opacity: .8">
+        <span class="brand-text font-weight-light">Amecar</span>
+      </a>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <!-- Sidebar Menu -->
-      <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item">
-            <a href="/index" class="nav-link">
-              <i class="far nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-house-door-fill" viewBox="0 0 16 16">
-                  <path d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5"/>
-                </svg>
-              </i>
-              <p>
-                Home
-              </p>
-            </a>
-          </li>
-          <li class="nav-item">
-            {% if 'productos' in permisos or 'clientes' in permisos or 'empleados' in permisos or 'roles' in permisos%}
-            <a href="#" class="nav-link">
-              <i class="far nav-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-fill-gear" viewBox="0 0 16 16">
-                <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4m9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382zM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0"/>
-                </svg>
-              </i>
-              <p>
-                Administrar
-                <i class="fas fa-angle-left right"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              {% if 'productos' in permisos %}
-              <li class="nav-item">
-                <a href="/productos" class="nav-link">
-                  <i class="far nav-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-box-seam-fill" viewBox="0 0 16 16">
-                      <path fill-rule="evenodd" d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.01-.003.268-.108a.75.75 0 0 1 .558 0l.269.108.01.003zM10.404 2 4.25 4.461 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339L8 5.961 5.596 5l6.154-2.461z"/>
-                    </svg>
-                  </i>
-                  <p>Productos</p>
-                </a>
-              </li>
+            <li class="nav-item">
+              <a href="/index" class="nav-link">
+                <i class="far nav-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    class="bi bi-house-door-fill" viewBox="0 0 16 16">
+                    <path
+                      d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5" />
+                  </svg>
+                </i>
+                <p>
+                  Home
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              {% if 'productos' in permisos or 'clientes' in permisos or 'empleados' in permisos or 'roles' in
+              permisos%}
+              <a href="#" class="nav-link">
+                <i class="far nav-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    class="bi bi-person-fill-gear" viewBox="0 0 16 16">
+                    <path
+                      d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4m9.886-3.54c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382zM14 12.5a1.5 1.5 0 1 0-3 0 1.5 1.5 0 0 0 3 0" />
+                  </svg>
+                </i>
+                <p>
+                  Administrar
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                {% if 'productos' in permisos %}
+                <li class="nav-item">
+                  <a href="/productos" class="nav-link">
+                    <i class="far nav-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-box-seam-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                          d="M15.528 2.973a.75.75 0 0 1 .472.696v8.662a.75.75 0 0 1-.472.696l-7.25 2.9a.75.75 0 0 1-.557 0l-7.25-2.9A.75.75 0 0 1 0 12.331V3.669a.75.75 0 0 1 .471-.696L7.443.184l.01-.003.268-.108a.75.75 0 0 1 .558 0l.269.108.01.003zM10.404 2 4.25 4.461 1.846 3.5 1 3.839v.4l6.5 2.6v7.922l.5.2.5-.2V6.84l6.5-2.6v-.4l-.846-.339L8 5.961 5.596 5l6.154-2.461z" />
+                      </svg>
+                    </i>
+                    <p>Productos</p>
+                  </a>
+                </li>
+                {% endif %}
+                {% if 'clientes' in permisos %}
+                <li class="nav-item">
+                  <a href="/clientes" class="nav-link">
+                    <i class="far nav-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-person-fill-check" viewBox="0 0 16 16">
+                        <path
+                          d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                        <path
+                          d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4" />
+                      </svg>
+                    </i>
+                    <p>Clientes</p>
+                  </a>
+                </li>
+                {% endif %}
+                {% if 'empleados' in permisos %}
+                <li class="nav-item">
+                  <a href="/empleados" class="nav-link">
+                    <i class="far nav-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-person-badge-fill" viewBox="0 0 16 16">
+                        <path
+                          d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm4.5 0a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zM8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6m5 2.755C12.146 12.825 10.623 12 8 12s-4.146.826-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1z" />
+                      </svg>
+                    </i>
+                    <p>Empleados</p>
+                  </a>
+                </li>
+                {% endif %}
+                {% if 'roles' in permisos %}
+                <li class="nav-item">
+                  <a href="/roles" class="nav-link">
+                    <i class="far nav-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-person-circle" viewBox="0 0 16 16">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                        <path fill-rule="evenodd"
+                          d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                      </svg>
+                    </i>
+                    <p>Roles</p>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
               {% endif %}
-              {% if 'clientes' in permisos %}
-              <li class="nav-item">
-                <a href="/clientes" class="nav-link">
-                  <i class="far nav-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-fill-check" viewBox="0 0 16 16">
-                      <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                      <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
-                    </svg>
-                  </i>
-                  <p>Clientes</p>
-                </a>
-              </li>
+            </li>
+            <li class="nav-item">
+              {% if 'ventas' in permisos or 'detalleVentas' in permisos or 'recuperarVentas' in permisos%}
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                    class="bi bi-tags-fill" viewBox="0 0 16 16">
+                    <path
+                      d="M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586zm3.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+                    <path
+                      d="M1.293 7.793A1 1 0 0 1 1 7.086V2a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l.043-.043z" />
+                  </svg>
+                </i>
+                <p>
+                  Ventas
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                {% if 'ventas' in permisos %}
+                <li class="nav-item">
+                  <a href="/ventas" class="nav-link">
+                    <i class="far nav-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-cart-check-fill" viewBox="0 0 16 16">
+                        <path
+                          d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-1.646-7.646-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708" />
+                      </svg>
+                    </i>
+                    <p>Realizar Ventas</p>
+                  </a>
+                </li>
+                {% endif %}
+                {% if 'detalleVentas' in permisos %}
+                <li class="nav-item">
+                  <a href="/detalleVentas" class="nav-link">
+                    <i class="far nav-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-clipboard2-data-fill" viewBox="0 0 16 16">
+                        <path
+                          d="M10 .5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5.5.5 0 0 1-.5.5.5.5 0 0 0-.5.5V2a.5.5 0 0 0 .5.5h5A.5.5 0 0 0 11 2v-.5a.5.5 0 0 0-.5-.5.5.5 0 0 1-.5-.5" />
+                        <path
+                          d="M4.085 1H3.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1h-.585q.084.236.085.5V2a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 4 2v-.5q.001-.264.085-.5M10 7a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0V9a1 1 0 0 1 1-1" />
+                      </svg>
+                    </i>
+                    <p>Detalle Ventas</p>
+                  </a>
+                </li>
+                {% endif %}
+                {% if 'recuperarVentas' in permisos %}
+                <li class="nav-item">
+                  <a href="/recuperarVentas" class="nav-link">
+                    <i class="far nav-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-recycle" viewBox="0 0 16 16">
+                        <path
+                          d="M9.302 1.256a1.5 1.5 0 0 0-2.604 0l-1.704 2.98a.5.5 0 0 0 .869.497l1.703-2.981a.5.5 0 0 1 .868 0l2.54 4.444-1.256-.337a.5.5 0 1 0-.26.966l2.415.647a.5.5 0 0 0 .613-.353l.647-2.415a.5.5 0 1 0-.966-.259l-.333 1.242zM2.973 7.773l-1.255.337a.5.5 0 1 1-.26-.966l2.416-.647a.5.5 0 0 1 .612.353l.647 2.415a.5.5 0 0 1-.966.259l-.333-1.242-2.545 4.454a.5.5 0 0 0 .434.748H5a.5.5 0 0 1 0 1H1.723A1.5 1.5 0 0 1 .421 12.24zm10.89 1.463a.5.5 0 1 0-.868.496l1.716 3.004a.5.5 0 0 1-.434.748h-5.57l.647-.646a.5.5 0 1 0-.708-.707l-1.5 1.5a.5.5 0 0 0 0 .707l1.5 1.5a.5.5 0 1 0 .708-.707l-.647-.647h5.57a1.5 1.5 0 0 0 1.302-2.244z" />
+                      </svg>
+                    </i>
+                    <p>Recuperar Ventas</p>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
               {% endif %}
-              {% if 'empleados' in permisos %}
-              <li class="nav-item">
-                <a href="/empleados" class="nav-link">
-                  <i class="far nav-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-badge-fill" viewBox="0 0 16 16">
-                      <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm4.5 0a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zM8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6m5 2.755C12.146 12.825 10.623 12 8 12s-4.146.826-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1z"/>
-                    </svg>
-                  </i>
-                  <p>Empleados</p>
-                </a>
-              </li>
+            </li>
+            <li class="nav-item">
+              {% if 'reporteVentas' in permisos%}
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-bar-graph-fill" viewBox="0 0 16 16">
+                    <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2m-2 11.5v-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5m-2.5.5a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5zm-3 0a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5z"/>
+                  </svg>
+                </i>
+                <p>
+                  Reportes
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                {% if 'reporteVentas' in permisos %}
+                <li class="nav-item">
+                  <a href="/reporteVentas" class="nav-link">
+                    <i class="far nav-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        class="bi bi-newspaper" viewBox="0 0 16 16">
+                        <path
+                          d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5z" />
+                        <path
+                          d="M2 3h10v2H2zm0 3h4v3H2zm0 4h4v1H2zm0 2h4v1H2zm5-6h2v1H7zm3 0h2v1h-2zM7 8h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2z" />
+                      </svg>
+                    </i>
+                    <p>Reporte Ventas</p>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
               {% endif %}
-              {% if 'roles' in permisos %}
-              <li class="nav-item">
-                <a href="/roles" class="nav-link">
-                  <i class="far nav-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-                      <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                      <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
-                    </svg>
-                  </i>
-                  <p>Roles</p>
-                </a>
-              </li>
-              {% endif %}
-            </ul>
-            {% endif %}
-          </li>
-          <li class="nav-item">
-            {% if 'ventas' in permisos or 'detalleVentas' in permisos or 'recuperarVentas' in permisos%}
-            <a href="#" class="nav-link">
-              <i class="nav-icon fas">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-tags-fill" viewBox="0 0 16 16">
-                  <path d="M2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586zm3.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
-                  <path d="M1.293 7.793A1 1 0 0 1 1 7.086V2a1 1 0 0 0-1 1v4.586a1 1 0 0 0 .293.707l7 7a1 1 0 0 0 1.414 0l.043-.043z"/>
-                </svg>
-              </i>
-              <p>
-                Ventas
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              {% if 'ventas' in permisos %}
-              <li class="nav-item">
-                <a href="/ventas" class="nav-link">
-                  <i class="far nav-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart-check-fill" viewBox="0 0 16 16">
-                      <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m-1.646-7.646-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708"/>
-                    </svg>
-                  </i>
-                  <p>Realizar Ventas</p>
-                </a>
-              </li>
-              {% endif %}
-              {% if 'detalleVentas' in permisos %}
-              <li class="nav-item">
-                <a href="/detalleVentas" class="nav-link">
-                  <i class="far nav-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-clipboard2-data-fill" viewBox="0 0 16 16">
-                      <path d="M10 .5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5.5.5 0 0 1-.5.5.5.5 0 0 0-.5.5V2a.5.5 0 0 0 .5.5h5A.5.5 0 0 0 11 2v-.5a.5.5 0 0 0-.5-.5.5.5 0 0 1-.5-.5"/>
-                      <path d="M4.085 1H3.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1h-.585q.084.236.085.5V2a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 4 2v-.5q.001-.264.085-.5M10 7a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0V9a1 1 0 0 1 1-1"/>
-                    </svg>
-                  </i>
-                  <p>Detalle Ventas</p>
-                </a>
-              </li>
-              {% endif %}
-              {% if 'recuperarVentas' in permisos %}
-              <li class="nav-item">
-                <a href="/recuperarVentas" class="nav-link">
-                  <i class="far nav-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-recycle" viewBox="0 0 16 16">
-                      <path d="M9.302 1.256a1.5 1.5 0 0 0-2.604 0l-1.704 2.98a.5.5 0 0 0 .869.497l1.703-2.981a.5.5 0 0 1 .868 0l2.54 4.444-1.256-.337a.5.5 0 1 0-.26.966l2.415.647a.5.5 0 0 0 .613-.353l.647-2.415a.5.5 0 1 0-.966-.259l-.333 1.242zM2.973 7.773l-1.255.337a.5.5 0 1 1-.26-.966l2.416-.647a.5.5 0 0 1 .612.353l.647 2.415a.5.5 0 0 1-.966.259l-.333-1.242-2.545 4.454a.5.5 0 0 0 .434.748H5a.5.5 0 0 1 0 1H1.723A1.5 1.5 0 0 1 .421 12.24zm10.89 1.463a.5.5 0 1 0-.868.496l1.716 3.004a.5.5 0 0 1-.434.748h-5.57l.647-.646a.5.5 0 1 0-.708-.707l-1.5 1.5a.5.5 0 0 0 0 .707l1.5 1.5a.5.5 0 1 0 .708-.707l-.647-.647h5.57a1.5 1.5 0 0 0 1.302-2.244z"/>
-                    </svg>
-                  </i>
-                  <p>Recuperar Ventas</p>
-                </a>
-              </li>
-              {% endif %}
-            </ul>
-            {% endif %}
-          </li>
+            </li>
 
-        </ul>
-      </nav>
+          </ul>
+        </nav>
 
-      <!-- Botón en la parte inferior -->
-      <div class="mt-auto p-3">
-        <button class="btn btn-danger btn-block" id="logout-button">
-          <i class="far nav-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
-              <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
-            </svg>
-            
-          </i> 
-          <p class="sidebar-text d-none d-md-inline ml-2 mb-0">Cerrar Sesión</p>
-        </button>
+        <!-- Botón en la parte inferior -->
+        <div class="mt-auto p-3">
+          <button class="btn btn-danger btn-block" id="logout-button">
+            <i class="far nav-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                  d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
+                <path fill-rule="evenodd"
+                  d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
+              </svg>
+
+            </i>
+            <p class="sidebar-text d-none d-md-inline ml-2 mb-0">Cerrar Sesión</p>
+          </button>
+        </div>
+        <!-- /.sidebar-menu -->
       </div>
-      <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
+      <!-- /.sidebar -->
+    </aside>
 
 
     <!-- Contenido principal -->
     <div class="content-wrapper">
-        {% block content %}
-                <!-- El contenido por defecto se puede dejar vacío o con algo básico -->
-        {% endblock %}
+      {% block content %}
+      <!-- El contenido por defecto se puede dejar vacío o con algo básico -->
+      {% endblock %}
     </div>
 
     <footer class="main-footer">
-        <strong>Copyright &copy; 2025 Amercar.</strong>
-        Todos los derechos recervados.
+      <strong>Copyright &copy; 2025 Amecar.</strong>
+      Todos los derechos recervados.
     </footer>
 
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
+      <!-- Control sidebar content goes here -->
     </aside>
     <!-- /.control-sidebar -->
-     
-</div>  
-<!-- ./wrapper -->
 
-<!-- jQuery -->
-<script src="../static/plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="../static/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables  & Plugins -->
-<script src="../static/plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="../static/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<script src="../static/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-<script src="../static/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-<script src="../static/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-<script src="../static/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-<script src="../static/plugins/jszip/jszip.min.js"></script>
-<script src="../static/plugins/pdfmake/pdfmake.min.js"></script>
-<script src="../static/plugins/pdfmake/vfs_fonts.js"></script>
-<script src="../static/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-<script src="../static/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-<script src="../static/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-<!-- AdminLTE App -->
-<script src="../static/dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="../static/dist/js/demo.js"></script>
-<!-- Toastr -->
-<script src="../static/plugins/toastr/toastr.min.js"></script>
-<!-- Bootstrap Switch -->
-<script src="../static/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+  </div>
+  <!-- ./wrapper -->
 
-<!-- Script para funciones que usen en cada pagina --> 
-<script src="../static/js/base.js"></script>
+  <!-- jQuery -->
+  <script src="../static/plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="../static/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- DataTables  & Plugins -->
+  <script src="../static/plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="../static/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <script src="../static/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="../static/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+  <script src="../static/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="../static/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+  <script src="../static/plugins/jszip/jszip.min.js"></script>
+  <script src="../static/plugins/pdfmake/pdfmake.min.js"></script>
+  <script src="../static/plugins/pdfmake/vfs_fonts.js"></script>
+  <script src="../static/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+  <script src="../static/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+  <script src="../static/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../static/dist/js/adminlte.min.js"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="../static/dist/js/demo.js"></script>
+  <!-- Toastr -->
+  <script src="../static/plugins/toastr/toastr.min.js"></script>
+  <!-- Bootstrap Switch -->
+  <script src="../static/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+  <!-- Select2 -->
+  <script src="../static/plugins/select2/js/select2.full.min.js"></script>
+  <!-- Script para funciones que usen en cada pagina -->
+  <script src="../static/js/base.js"></script>
 
-{% block script %}
-<!-- El contenido de los scripts de la pagina --> 
-{% endblock %}
+  {% block script %}
+  <!-- El contenido de los scripts de la pagina -->
+  {% endblock %}
 </body>
+
 </html>

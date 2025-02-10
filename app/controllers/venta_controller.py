@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, send_from_directory, session
+from flask import Blueprint, jsonify, request, send_from_directory, session, make_response
 from app import db
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from fpdf import FPDF
 from datetime import datetime
 import platform
+import textwrap
 
 load_dotenv()
 
@@ -551,3 +552,272 @@ def imprimir_pdf(pdf_path):
             win32api.ShellExecute(0, "print", pdf_path, f'/d:"{printer_name}"', ".", 0)
         except Exception as e:
             print(f"Error al imprimir en Windows: {e}")
+
+@venta.route('/getAllWithFilter', methods=['POST'])
+@login_required
+def getAllWithFilter():
+    data = request.get_json()
+
+    # Parámetros recibidos desde el frontend
+    check_todo        = data.get('checkTodo', False)
+    filtro_tipo       = data.get('filtroTipo')      # "cliente", "producto" o "empleado"
+    selected_ids      = data.get('selectedIds', [])
+    fecha_inicio_str  = data.get('fechaInicio')
+    fecha_fin_str     = data.get('fechaFin')
+    check_boleta      = data.get('checkBoleta', False)
+    check_factura     = data.get('checkFactura', False)
+
+    # Iniciar la consulta filtrando solo las ventas activas (Estado=1)
+    query = Venta.query.filter_by(Estado=1)
+
+    # Filtrado por fecha
+    if fecha_inicio_str:
+        try:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+            query = query.filter(Venta.FechaVenta >= fecha_inicio)
+        except Exception as e:
+            return jsonify({'success': False, 'message': 'FechaInicio inválida'}), 400
+
+    if fecha_fin_str:
+        try:
+            fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
+            query = query.filter(Venta.FechaVenta <= fecha_fin)
+        except Exception as e:
+            return jsonify({'success': False, 'message': 'FechaFin inválida'}), 400
+
+    # Filtrado por Tipo de Venta (boleta y/o factura)
+    tipo_venta_filter = []
+    if check_boleta:
+        tipo_venta_filter.append('Boleta')
+    if check_factura:
+        tipo_venta_filter.append('Factura')
+    if tipo_venta_filter:
+        query = query.filter(Venta.TipoVenta.in_(tipo_venta_filter))
+    
+    # Si "Todos" está marcado, se ignoran los filtros del select;
+    # de lo contrario, se filtra según el tipo (cliente, empleado o producto) y los IDs seleccionados.
+    if not check_todo and selected_ids:
+        if filtro_tipo == "cliente":
+            query = query.filter(Venta.Cliente_ID.in_(selected_ids))
+        elif filtro_tipo == "empleado":
+            query = query.filter(Venta.Empleado_ID.in_(selected_ids))
+        elif filtro_tipo == "producto":
+            query = query.filter(Venta.detalles.any(DetalleVenta.Producto_ID.in_(selected_ids)))
+
+    # Ejecutar la consulta
+    ventas = query.all()
+
+    # Formatear la respuesta de la misma forma que en getAll
+    result = []
+    for venta in ventas:
+        if venta.Cliente_ID is not None:
+            result.append({
+                "Venta_ID": venta.Venta_ID,
+                "Comprador": venta.cliente.Nombre,
+                "NumDoc": venta.cliente.NumDoc,
+                "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                "FechaVenta": venta.FechaVenta.isoformat(),
+                "TipoVenta": venta.TipoVenta,
+                "TipoPago": venta.TipoPago,
+                "Total": venta.Total,
+                "Estado": venta.Estado
+            })
+        else:
+            # Si no tiene Cliente_ID, se formatea según el tipo de venta
+            if venta.TipoVenta.upper() == "BOLETA":
+                result.append({
+                    "Venta_ID": venta.Venta_ID,
+                    "Comprador": venta.DatosDocumentoVenta.get("Nombre"),
+                    "NumDoc": venta.DatosDocumentoVenta.get("DNI"),
+                    "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                    "FechaVenta": venta.FechaVenta.isoformat(),
+                    "TipoVenta": venta.TipoVenta,
+                    "TipoPago": venta.TipoPago,
+                    "Total": venta.Total,
+                    "Estado": venta.Estado
+                })
+            elif venta.TipoVenta.upper() == "FACTURA":
+                result.append({
+                    "Venta_ID": venta.Venta_ID,
+                    "Comprador": venta.DatosDocumentoVenta.get("Razon_Social"),
+                    "NumDoc": venta.DatosDocumentoVenta.get("RUC"),
+                    "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                    "FechaVenta": venta.FechaVenta.isoformat(),
+                    "TipoVenta": venta.TipoVenta,
+                    "TipoPago": venta.TipoPago,
+                    "Total": venta.Total,
+                    "Estado": venta.Estado
+                })
+
+    return jsonify({"success": True, "data": result}), 200
+
+@venta.route('/printPdf', methods=['POST'])
+@login_required
+def printPdf():
+    data = request.get_json()
+
+    # Parámetros recibidos desde el frontend
+    check_todo        = data.get('checkTodo', False)
+    filtro_tipo       = data.get('filtroTipo')      # "cliente", "producto" o "empleado"
+    selected_ids      = data.get('selectedIds', [])
+    fecha_inicio_str  = data.get('fechaInicio')
+    fecha_fin_str     = data.get('fechaFin')
+    check_boleta      = data.get('checkBoleta', False)
+    check_factura     = data.get('checkFactura', False)
+
+    # Iniciar la consulta filtrando solo ventas activas (Estado=1)
+    query = Venta.query.filter_by(Estado=1)
+
+    # Filtrado por fecha
+    if fecha_inicio_str:
+        try:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+            query = query.filter(Venta.FechaVenta >= fecha_inicio)
+        except Exception as e:
+            return jsonify({'success': False, 'message': 'FechaInicio inválida'}), 400
+
+    if fecha_fin_str:
+        try:
+            fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
+            query = query.filter(Venta.FechaVenta <= fecha_fin)
+        except Exception as e:
+            return jsonify({'success': False, 'message': 'FechaFin inválida'}), 400
+
+    # Filtrado por Tipo de Venta (Boleta y/o Factura)
+    tipo_venta_filter = []
+    if check_boleta:
+        tipo_venta_filter.append('Boleta')
+    if check_factura:
+        tipo_venta_filter.append('Factura')
+    if tipo_venta_filter:
+        query = query.filter(Venta.TipoVenta.in_(tipo_venta_filter))
+    
+    # Filtrado por elementos seleccionados (si "Todos" no está marcado)
+    if not check_todo and selected_ids:
+        if filtro_tipo == "cliente":
+            query = query.filter(Venta.Cliente_ID.in_(selected_ids))
+        elif filtro_tipo == "empleado":
+            query = query.filter(Venta.Empleado_ID.in_(selected_ids))
+        elif filtro_tipo == "producto":
+            query = query.filter(Venta.detalles.any(DetalleVenta.Producto_ID.in_(selected_ids)))
+    
+    # Ejecutar la consulta
+    ventas = query.all()
+
+    # Formatear los datos al estilo de getAll
+    result = []
+    for venta in ventas:
+        if venta.Cliente_ID is not None:
+            result.append({
+                "Venta_ID": venta.Venta_ID,
+                "Comprador": venta.cliente.Nombre,
+                "NumDoc": venta.cliente.NumDoc,
+                "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                "FechaVenta": venta.FechaVenta.isoformat(),
+                "TipoVenta": venta.TipoVenta,
+                "TipoPago": venta.TipoPago,
+                "Total": str(venta.Total),  # Convertir a cadena si es necesario
+                "Estado": venta.Estado
+            })
+        else:
+            if venta.TipoVenta.upper() == "BOLETA":
+                result.append({
+                    "Venta_ID": venta.Venta_ID,
+                    "Comprador": venta.DatosDocumentoVenta.get("Nombre"),
+                    "NumDoc": venta.DatosDocumentoVenta.get("DNI"),
+                    "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                    "FechaVenta": venta.FechaVenta.isoformat(),
+                    "TipoVenta": venta.TipoVenta,
+                    "TipoPago": venta.TipoPago,
+                    "Total": str(venta.Total),
+                    "Estado": venta.Estado
+                })
+            elif venta.TipoVenta.upper() == "FACTURA":
+                result.append({
+                    "Venta_ID": venta.Venta_ID,
+                    "Comprador": venta.DatosDocumentoVenta.get("Razon_Social"),
+                    "NumDoc": venta.DatosDocumentoVenta.get("RUC"),
+                    "Empleado_Nombre": venta.empleado.Nombres + " " + venta.empleado.Apellidos,
+                    "FechaVenta": venta.FechaVenta.isoformat(),
+                    "TipoVenta": venta.TipoVenta,
+                    "TipoPago": venta.TipoPago,
+                    "Total": str(venta.Total),
+                    "Estado": venta.Estado
+                })
+
+    # Crear PDF en orientación horizontal
+    pdf = FPDF('L', 'mm', 'A4')
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, "Reporte de Ventas", ln=True, align="C")
+    pdf.ln(10)
+
+    # Configurar la fuente para la tabla
+    pdf.set_font("Arial", "B", 10)
+
+    # Cabeceras de la tabla
+    headers = ["Comprador", "N° Documento", "Empleado", "Fecha de Venta", "Tipo de Venta", "Tipo de Pago", "Total"]
+    col_widths = [80, 30, 50, 35, 30, 30, 20]  # Ancho de columnas
+    row_height = 8  # Altura base de la celda
+
+    # Dibujar cabeceras
+    for i, header in enumerate(headers):
+        pdf.cell(col_widths[i], row_height, header, border=1, align="C")
+    pdf.ln()
+
+    # Configurar fuente para los datos
+    pdf.set_font("Arial", "", 10)
+
+    # Inicializar suma total
+    total_general = 0
+
+    # Función para calcular la altura de la fila
+    def get_row_height(row_data, col_widths, base_height):
+        max_lines = 1
+        for i, text in enumerate(row_data):
+            wrapped_text = textwrap.wrap(text, width=int(col_widths[i] / 2.5))  # Ajustar el texto al ancho de la celda
+            lines = len(wrapped_text)  # Contar cuántas líneas ocupa
+            max_lines = max(max_lines, lines)  # Tomar el mayor número de líneas en la fila
+        return max_lines * base_height  # Altura total de la fila
+
+    # Dibujar filas con datos de ventas
+    for venta in result:
+        row_data = [
+            str(venta["Comprador"]),
+            str(venta["NumDoc"]),
+            str(venta["Empleado_Nombre"]),
+            str(venta["FechaVenta"]),
+            str(venta["TipoVenta"]),
+            str(venta["TipoPago"]),
+            f"{float(venta['Total']):.2f}"
+        ]
+
+        # Calcular la altura máxima de la fila
+        max_height = get_row_height(row_data, col_widths, row_height)
+
+        # Guardar la posición Y actual
+        y_position = pdf.get_y()
+
+        # Dibujar cada celda asegurando que todas tengan la misma altura
+        for i, text in enumerate(row_data):
+            x_position = pdf.get_x()
+            pdf.multi_cell(col_widths[i], row_height, text, border=1, align="L")
+            pdf.set_xy(x_position + col_widths[i], y_position)  # Restaurar la posición en X
+
+        pdf.ln(max_height)  # Saltar a la siguiente fila
+
+        # Sumar al total general
+        total_general += float(venta["Total"])
+
+    # Dibujar fila del total general
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(sum(col_widths[:-1]), row_height, "TOTAL GENERAL:", border=1, align="R")
+    pdf.cell(col_widths[-1], row_height, f"{total_general:.2f}", border=1, align="R")
+
+    # Generar el PDF en memoria
+    pdf_output = pdf.output(dest='S').encode('latin1')
+
+    response = make_response(pdf_output)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=ventas_report.pdf'
+    return response
