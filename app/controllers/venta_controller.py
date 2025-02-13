@@ -821,3 +821,61 @@ def printPdf():
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'attachment; filename=ventas_report.pdf'
     return response
+
+@venta.route('/ultimas-ventas', methods=['GET'])
+@login_required
+def ultimas_ventas():
+    try:
+        # Obtener las 5 ventas activas más recientes ordenadas por fecha (descendente)
+        ventas = Venta.query.filter_by(Estado=1).order_by(Venta.FechaVenta.desc()).limit(5).all()
+        result = []
+        for venta in ventas:
+            # Si existen detalles, tomamos el nombre del primer producto (ajusta según tu modelo)
+            producto = ""
+            if venta.detalles and len(venta.detalles) > 0:
+                # Se asume que cada DetalleVenta tiene una relación 'producto' con el atributo 'Descripcion'
+                producto = venta.detalles[0].producto.Descripcion if hasattr(venta.detalles[0], 'producto') else ""
+            if venta.Cliente_ID is not None:
+                result.append({
+                    "Venta_ID": venta.Venta_ID,
+                    "cliente": venta.cliente.Nombre,
+                    "producto": producto,
+                    "total": float(venta.Total),
+                    "fecha": venta.FechaVenta.isoformat()
+                })
+            else:
+                # Para ventas sin cliente (venta a un no registrado, por ejemplo)
+                if venta.TipoVenta.upper() == "BOLETA":
+                    result.append({
+                        "Venta_ID": venta.Venta_ID,
+                        "cliente": venta.DatosDocumentoVenta["Nombre"],
+                        "producto": producto,
+                        "total": float(venta.Total),
+                        "fecha": venta.FechaVenta.isoformat()
+                    })
+                elif venta.TipoVenta.upper() == "FACTURA":
+                    result.append({
+                        "Venta_ID": venta.Venta_ID,
+                        "cliente": venta.DatosDocumentoVenta["Razon_Social"],
+                        "producto": producto,
+                        "total": float(venta.Total),
+                        "fecha": venta.FechaVenta.isoformat()
+                    })
+        return jsonify({"success": True, "data": result}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@venta.route('/ventas-por-mes', methods=['GET'])
+@login_required
+def ventas_por_mes():
+    try:
+        from sqlalchemy import extract, func
+        ventas_by_month = db.session.query(
+            extract('month', Venta.FechaVenta).label('month'),
+            func.sum(Venta.Total).label('total')
+        ).filter(Venta.Estado == 1).group_by(extract('month', Venta.FechaVenta)).all()
+
+        result = {str(int(row.month)): float(row.total) for row in ventas_by_month}
+        return jsonify({"success": True, "data": result}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

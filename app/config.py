@@ -7,6 +7,7 @@ API_PERMISSIONS = {
     "/api/cliente/delete": None,  # Bloqueado
     "/api/cliente/desactivar": ["clientes"],
     "/api/cliente/getRucODni": ["ventas"],
+    "/api/cliente/clientes-frecuentes": ["home"],
 
     # APIs de distrito
     "/api/distrito/getAll": ["clientes", "empleados"],
@@ -18,6 +19,7 @@ API_PERMISSIONS = {
     "/api/empleado/update": ["empleados"],
     "/api/empleado/delete": None,  # Bloqueado
     "/api/empleado/desactivar": ["empleados"],
+    "/api/empleado/mejor-empleado": ["home"],
 
     # APIs de main (pantallas)
     "/index": ["home"],
@@ -38,6 +40,8 @@ API_PERMISSIONS = {
     "/api/producto/delete": None,  # Bloqueado
     "/api/producto/desactivar": ["productos"],
     "/api/producto/getCodBarras": ["ventas"],
+    "/api/producto/productos-mas-vendidos": ["home"],
+    "/api/producto/stock-bajo": ["home"],
     
     # APIs de rol
     "/api/rol/getAll": ["empleados","roles"],
@@ -67,5 +71,7 @@ API_PERMISSIONS = {
     "/api/venta/savePdf": ["ventas"],
     "/api/venta/getAllWithFilter": ["reporteVentas"],
     "/api/venta/printPdf": ["reporteVentas"],
+    "/api/venta/ultimas-ventas": ["home"],
+    "/api/venta/ventas-por-mes": ["home"],
 
 }

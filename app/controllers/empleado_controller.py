@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app import db
-from ..models import Empleado
+from ..models import Empleado, Venta
 from ..utils import login_required
 
 empleado = Blueprint('empleado', __name__)
@@ -178,3 +178,30 @@ def desactivar(Empleado_ID):
             "error": str(e)
         }), 500
     
+@empleado.route('/mejor-empleado', methods=['GET'])
+@login_required
+def mejor_empleado():
+    try:
+        from sqlalchemy import func
+        best_emp = db.session.query(
+            Empleado.Empleado_ID,
+            Empleado.Nombres,
+            Empleado.Apellidos,
+            func.sum(Venta.Total).label('total_ventas')
+        ).join(Venta, Empleado.Empleado_ID == Venta.Empleado_ID
+        ).filter(Venta.Estado == 1
+        ).group_by(Empleado.Empleado_ID, Empleado.Nombres, Empleado.Apellidos
+        ).order_by(func.sum(Venta.Total).desc()
+        ).first()
+        
+        if best_emp is None:
+            return jsonify({"success": False, "message": "No se encontró un empleado."}), 404
+        
+        result = {
+            "Empleado_ID": best_emp[0],
+            "nombre": best_emp[1] + " " + best_emp[2],
+            "total_ventas": float(best_emp[3])
+        }
+        return jsonify({"success": True, "data": result}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

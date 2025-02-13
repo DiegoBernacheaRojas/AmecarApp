@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app import db
 from sqlalchemy.exc import SQLAlchemyError
-from ..models import Cliente
+from ..models import Cliente, Venta
 from ..utils import login_required
 
 cliente = Blueprint('cliente', __name__)
@@ -261,3 +261,33 @@ def getRucODni():
 
     except SQLAlchemyError as e:
         return jsonify({"success": False, "message": "Error al consultar la base de datos", "error": str(e)}), 500
+
+@cliente.route('/clientes-frecuentes', methods=['GET'])
+@login_required
+def clientes_frecuentes():
+    try:
+        from sqlalchemy import func
+        # Seleccionamos solo las columnas necesarias: Cliente_ID, Nombre y NumDoc,
+        # y contamos el número de ventas (compras) para cada cliente.
+        freq_clients = db.session.query(
+            Cliente.Cliente_ID,
+            Cliente.Nombre,
+            Cliente.NumDoc,
+            func.count(Venta.Venta_ID).label('compras')
+        ).join(Venta, Cliente.Cliente_ID == Venta.Cliente_ID
+        ).filter(Venta.Estado == 1
+        ).group_by(Cliente.Cliente_ID, Cliente.Nombre, Cliente.NumDoc
+        ).order_by(func.count(Venta.Venta_ID).desc()
+        ).limit(5).all()
+        
+        result = []
+        for cliente_id, nombre, numdoc, compras in freq_clients:
+            result.append({
+                "Cliente_ID": cliente_id,
+                "nombre": nombre,
+                "NumDoc": numdoc,
+                "compras": compras
+            })
+        return jsonify({"success": True, "data": result}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app import db
-from ..models import Producto
+from ..models import Producto, DetalleVenta
 from ..utils import login_required
 
 producto = Blueprint('producto', __name__)
@@ -185,3 +185,51 @@ def getCodBarras():
     }
 
     return jsonify(producto_data), 200
+
+@producto.route('/productos-mas-vendidos', methods=['GET'])
+@login_required
+def productos_mas_vendidos():
+    try:
+        from sqlalchemy import func
+        ventas_productos = db.session.query(
+            Producto.Producto_ID,
+            Producto.Descripcion,
+            func.sum(DetalleVenta.Cantidad).label('cantidad_vendida')
+        ).join(DetalleVenta, Producto.Producto_ID == DetalleVenta.Producto_ID
+        ).filter(Producto.Estado == True
+        ).group_by(Producto.Producto_ID, Producto.Descripcion  # Se incluye Descripcion en el GROUP BY
+        ).order_by(func.sum(DetalleVenta.Cantidad).desc()
+        ).limit(5).all()
+
+        result = []
+        for prod in ventas_productos:
+            result.append({
+                "Producto_ID": prod.Producto_ID,
+                "nombre": prod.Descripcion,
+                "cantidad": prod.cantidad_vendida
+            })
+        return jsonify({"success": True, "data": result}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+    
+@producto.route('/stock-bajo', methods=['GET'])
+@login_required
+def stock_bajo():
+    try:
+        threshold = 10  # Define el umbral de stock bajo
+        productos = Producto.query.filter(Producto.Estado == True, Producto.Stock < threshold).all()
+        data = []
+        for producto in productos:
+            data.append({
+                "Producto_ID": producto.Producto_ID,
+                "nombre": producto.Descripcion,
+                "stock": producto.Stock,
+                "SubCategoria": producto.subcategoria.Nombre if producto.subcategoria else "",
+                "CodigoBarras": producto.CodigoBarras,
+                "Precio": float(producto.Precio),
+                "FechaIngreso": producto.FechaIngreso.isoformat()
+            })
+        return jsonify({"success": True, "data": data}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
