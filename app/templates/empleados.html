@@ -1,159 +1,200 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}Empleados{% endblock %} {% block
+content %}
 
-{% block title %}Empleados{% endblock %}
-
-{% block content %}
-<div class="content-title">Empleados</div>
-
-
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Empleados</h1>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
 <div class="content">
-    <button class="btn btn-success nuevoBtn">Nuevo Empleado</button>
-    <br> <br>
-    <table id="tablaEmpleados" class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Tipo de documento</th>
-                <th>Numero de documento</th>
-                <th>Nombre</th>
-                <th>Rol</th>
-                <th>Distrito</th>
-                <th>Sexo</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
-                <th>Fecha de Nacimiento</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Carga dinámica -->
-        </tbody>
-    </table>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-gray-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">Registro de Empleados</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <button type="button" class="btn bg-gradient-success nuevoBtn" data-toggle="modal"
+                            data-target="#modal-nuevo">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="nav-icon fas bi bi-plus-circle-fill" viewBox="0 0 16 17">
+                                <path
+                                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z" />
+                            </svg>
+                            Nuevo Empleado
+                        </button>
+                        <br /><br />
+
+                        <table id="tablaEmpleados" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tipo de documento</th>
+                                    <th>Numero de documento</th>
+                                    <th>Nombre</th>
+                                    <th>Rol</th>
+                                    <th>Distrito</th>
+                                    <th>Sexo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Productos cargados dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.row -->
+        </div>
+    </div>
 </div>
 
-
-<div class="modal fade" id="empleadoModal" tabindex="-1" role="dialog" aria-labelledby="empleadoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="empleadoModalLabel"></h5>
-                <button type="button" class="btn btn-link p-0 cerrarBtn" style="text-decoration: none; " >
-                    <span aria-hidden="true">&times;</span>
+<div class="modal fade" id="modal-nuevo">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content card card-primary" id="color-modal">
+            <!-- Cabecera del modal -->
+            <div class="modal-header card-header">
+                <h4 class="modal-title" id="modal-nuevoLabel"></h4>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <form id="empleadoForm">
+            <!-- Contenido del modal -->
+            <div class="modal-body card-body">
+                <form id="form">
                     <div class="row">
                         <!-- Columna izquierda -->
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="nombresEmpleado">Nombres</label>
-                                <input type="text" class="form-control" id="nombresEmpleado" required>
+                                <input type="text" class="form-control" id="nombresEmpleado" required />
                             </div>
-                            <br>
+                         
                             <div class="form-group">
                                 <label for="apellidosEmpleado">Apellidos</label>
-                                <input type="text" class="form-control" id="apellidosEmpleado" required>
+                                <input type="text" class="form-control" id="apellidosEmpleado" required />
                             </div>
-                            <br>
+                         
                             <div class="form-group">
                                 <label for="edadEmpleado">Edad</label>
-                                <input type="text" class="form-control" id="edadEmpleado" required>
+                                <input type="text" class="form-control" id="edadEmpleado" required />
                             </div>
-                            <br>
+                         
                             <div class="form-group">
                                 <label for="usuarioEmpleado">Usuario</label>
-                                <input type="text" class="form-control" id="usuarioEmpleado" required>
+                                <input type="text" class="form-control" id="usuarioEmpleado" required />
                             </div>
-                            <br>
+                        
                             <div class="form-group">
                                 <label for="claveEmpleado">Clave</label>
-                                <input type="text" class="form-control" id="claveEmpleado" required>
+                                <input type="text" class="form-control" id="claveEmpleado" required />
                             </div>
-                            <br>
+                          
                             <div class="form-group">
                                 <label for="telefonoEmpleado">Telefono</label>
-                                <input type="text" class="form-control" id="telefonoEmpleado" required>
+                                <input type="text" class="form-control" id="telefonoEmpleado" required />
                             </div>
-                            <br>
+                         
                         </div>
 
                         <!-- Columna derecha -->
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="rolEmpleado">Rol</label>
-                                <select class="form-control" id="rolEmpleado">
-                                </select>
+                                <select class="form-control" id="rolEmpleado"></select>
                             </div>
-                            <br>
+                        
                             <div class="form-group">
                                 <label for="distritoEmpleado">Distrito</label>
-                                <select class="form-control" id="distritoEmpleado">
-                                </select>
+                                <select class="form-control" id="distritoEmpleado"></select>
                             </div>
-                            <br>
+                          
                             <div class="form-group">
                                 <label for="sexoEmpleado">Sexo</label>
-                                <select class="form-control" id="sexoEmpleado">
-                                </select>
+                                <select class="form-control" id="sexoEmpleado"></select>
                             </div>
-                            <br>
+                            
                             <div class="form-group">
                                 <label for="tipoDocEmpleado">Tipo de documento</label>
-                                <select class="form-control" id="tipoDocEmpleado">
-                                </select>
+                                <select class="form-control" id="tipoDocEmpleado"></select>
                             </div>
-                            <br>
+                            
                             <div class="form-group">
                                 <label for="numDocEmpleado">Numero de documento</label>
-                                <input type="text" class="form-control" id="numDocEmpleado" required>
+                                <input type="text" class="form-control" id="numDocEmpleado" required />
                             </div>
-                            <br>
+                            
                             <div class="form-group">
                                 <label for="fechaNacEmpleado">Fecha de Nacimiento</label>
-                                <input type="date" class="form-control" id="fechaNacEmpleado" required>
+                                <input type="date" class="form-control" id="fechaNacEmpleado" required />
                             </div>
-                            <br>
+                    
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group">
-                            <label for="correoEmpleado">Correo</label>
-                            <input type="email" class="form-control" id="correoEmpleado" required>
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="correoEmpleado">Correo</label>
+                                <input type="email" class="form-control" id="correoEmpleado" required />
+                            </div>
                         </div>
-                        <br>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary cerrarBtn">Cerrar</button>
-                <button type="submit" class="btn btn-primary" id="guardarCliente">Registrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de confirmación de eliminación -->
-<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" role="dialog" aria-labelledby="confirmarEliminarModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmarEliminarModalLabel">Confirmación de Eliminación</h5>
-                <button type="button" class="btn btn-link p-0 cerrarBtn" style="text-decoration: none; " >
-                    <span aria-hidden="true">&times;</span>
+            <!-- Footer del modal -->
+            <div class="modal-footer card-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Cerrar
+                </button>
+                <button type="submit" class="btn btn-primary" id="guardar">
+                    Guardar
                 </button>
             </div>
-            <div class="modal-body">
-                ¿Estás seguro de que deseas eliminar este empleado?
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+
+<div class="modal fade" id="modal-confirm">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content card card-danger">
+            <!-- Cabecera del modal -->
+            <div class="modal-header card-header">
+                <h4 class="modal-title">Confirmar</h4>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span >&times;</span>
+                </button>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary cerrarBtn" >Cancelar</button>
-                <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
+            <!-- Contenido del modal -->
+            <div class="modal-body card-body">
+                <label>¿Estás seguro de que deseas eliminar este empleado? Esta acción no se puede deshacer.</label>
+            </div>
+            <!-- Footer del modal -->
+            <div class="modal-footer card-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" id="confirmarEliminar">Aceptar</button>
             </div>
         </div>
+        <!-- /.modal-content -->
     </div>
+    <!-- /.modal-dialog -->
 </div>
+<!-- /.modal -->
 
-
+{% endblock %} {% block script %}
 <script src="../static/js/empleados.js"></script>
 {% endblock %}

@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, session
 from ..utils import login_required
-from ..config import ROLES_PERMISOS
 
 # Crear Blueprint para las vistas
 main_bp = Blueprint('main', __name__)
@@ -10,48 +9,59 @@ def login():
     return render_template('login.html')  # Renderiza la vista principal
 
 @main_bp.route('/index')
-@login_required('Gerente','Empleado')  # Asegúrate de que solo los usuarios autenticados puedan acceder a esta ruta
+@login_required  # Asegúrate de que solo los usuarios autenticados puedan acceder a esta ruta
 def index():
-    rol = session.get('rol', 'guest')
-    permisos = ROLES_PERMISOS.get(rol, [])
+    permisos = session.get('permisos', 'guest')
     return render_template('index.html', permisos=permisos)
 
 @main_bp.route('/ventas')
-@login_required('Gerente')
+@login_required
 def ventas():
-    rol = session.get('rol', 'guest')
-    permisos = ROLES_PERMISOS.get(rol, [])
+    permisos = session.get('permisos', 'guest')
     return render_template('ventas.html', permisos=permisos)
 
 @main_bp.route('/clientes')
-@login_required('Gerente')
+@login_required
 def clientes():
-    rol = session.get('rol', 'guest')
-    permisos = ROLES_PERMISOS.get(rol, [])
+    permisos = session.get('permisos', 'guest')
     return render_template('clientes.html', permisos=permisos)
 
 @main_bp.route('/productos')
-@login_required('Gerente')
+@login_required
 def productos():
-    rol = session.get('rol', 'guest')
-    permisos = ROLES_PERMISOS.get(rol, [])
+    permisos = session.get('permisos', 'guest')
     return render_template('productos.html', permisos=permisos)
 
-@main_bp.route('/realizarVenta')
-@login_required('Gerente','Empleado')
-def realizarVenta():
-    rol = session.get('rol', 'guest')
-    permisos = ROLES_PERMISOS.get(rol, [])
-    return render_template('realizarVenta.html', permisos=permisos)
+@main_bp.route('/detalleVentas')
+@login_required
+def detalleVentas():
+    permisos = session.get('permisos', 'guest')
+    return render_template('detalleVentas.html', permisos=permisos)
 
 @main_bp.route('/empleados')
-@login_required('Gerente')
+@login_required
 def empleados():
-    rol = session.get('rol', 'guest')
-    permisos = ROLES_PERMISOS.get(rol, [])
+    permisos = session.get('permisos', 'guest')
     return render_template('empleados.html', permisos=permisos)
 
+@main_bp.route('/roles')
+@login_required
+def roles():
+    permisos = session.get('permisos', 'guest')
+    return render_template('roles.html', permisos=permisos)
+
+@main_bp.route('/recuperarVentas')
+@login_required
+def recuperarVentas():
+    permisos = session.get('permisos', 'guest')
+    return render_template('recuperarVentas.html', permisos=permisos)
+
+@main_bp.route('/reporteVentas')
+@login_required
+def reporteVentas():
+    permisos = session.get('permisos', 'guest')
+    return render_template('reporteVentas.html', permisos=permisos)
+
 @main_bp.route('/acceso_denegado')
-@login_required('Empleado')
 def acceso_denegado():
     return render_template('acceso_denegado.html')

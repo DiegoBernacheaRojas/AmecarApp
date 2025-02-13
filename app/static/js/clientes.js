@@ -12,18 +12,22 @@ function inicializarTabla() {
             { data: 'TipoDoc_ID' },
             { data: 'NumDoc' },
             { data: 'Direccion' },
-            { data: 'Distrito' },
             { data: 'Sexo' },
             { data: 'Correo' },
-            { data: 'Telefono' },
-            { data: 'FechaNacimiento' },
-            { data: 'FechaCreacion' },
             {
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-primary btn-sm editarBtn" data-id="${row.Cliente_ID}">Editar</button>
-                        <button class="btn btn-danger btn-sm eliminarBtn" data-id="${row.Cliente_ID}">Eliminar</button>
+                        <button type="button" class="btn btn-primary btn-sm editarBtn" data-id="${row.Cliente_ID}" data-target="#modal-nuevo" data-toggle="modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm eliminarBtn" data-id="${row.Cliente_ID}" data-target="#modal-confirm" data-toggle="modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                            </svg>
+                        </button>
                     `;
                 }
             }
@@ -54,7 +58,6 @@ function inicializarTabla() {
         ordering: true,
         searching: true,
         autoWidth: false,
-        scrollX: true,
     });
 }
 
@@ -84,12 +87,7 @@ async function llenarSelect(apiUrl, selectId, valueField, textField) {
 
 // Función para limpiar el modal
 function limpiarModal() {
-    $('#nombreCliente').val('');
-    $('#fechaNacimiento').val('');
-    $('#numeroDocumento').val('');
-    $('#direccionCliente').val('');
-    $('#telefonoCliente').val('');
-    $('#correoCliente').val('');
+    $('#form')[0].reset();
 }
 
 // Función principal para manejar eventos y lógica
@@ -107,24 +105,22 @@ async function main() {
     // Evento para abrir el modal de registro
     $(document).on('click', '.nuevoBtn', function () {
         limpiarModal();
-        $('#clienteModalLabel').text('Registrar Cliente');
-        $('#guardarCliente').text('Registrar');
-        $('#clienteModal').modal('show');
-    });
-
-    // Evento para cerrar modales
-    $(document).on('click', '.cerrarBtn', function () {
-        limpiarModal();
-        $('#clienteModal').modal('hide');
-        $('#confirmarEliminarModal').modal('hide');
         clienteId = null;
+        $('#modal-nuevoLabel').text('Registrar Cliente');
+        $('#guardar').text('Registrar');
+        if ($('#color-modal').hasClass('card-primary')) {
+            $('#color-modal').removeClass('card-primary').addClass('card-success');
+        } 
     });
 
     // Evento para editar cliente
     $(document).on('click', '.editarBtn', async function () {
         clienteId = $(this).data('id');
-        $('#clienteModalLabel').text('Editar Cliente');
-        $('#guardarCliente').text('Actualizar');
+        $('#modal-nuevoLabel').text('Editar Cliente');
+        $('#guardar').text('Actualizar');
+        if ($('#color-modal').hasClass('card-success')) {
+            $('#color-modal').removeClass('card-success').addClass('card-primary');
+        } 
 
         try {
             const response = await fetch(`/api/cliente/getId/${clienteId}`);
@@ -144,7 +140,6 @@ async function main() {
                 $('#correoCliente').val(cliente.Correo);
                 $('#fechaNacimiento').val(cliente.FechaNacimiento);
 
-                $('#clienteModal').modal('show');
             } else {
                 alert(`Error: ${data.message}`);
             }
@@ -156,7 +151,6 @@ async function main() {
     // Evento para eliminar cliente
     $(document).on('click', '.eliminarBtn', function () {
         clienteId = $(this).data('id');
-        $('#confirmarEliminarModal').modal('show');
     });
 
     // Confirmar eliminación
@@ -165,11 +159,10 @@ async function main() {
             const response = await fetch(`/api/cliente/desactivar/${clienteId}`, { method: 'POST' });
             if (response.ok) {
                 $('#tablaClientes').DataTable().ajax.reload();
-                $('#confirmarEliminarModal').modal('hide');
-                clienteId = null;
+                $('#modal-confirm').modal('hide');
             } else {
                 alert("Error al eliminar el cliente.");
-                clienteId = null;
+
             }
         } catch (error) {
             console.error("Error al eliminar cliente:", error);
@@ -177,7 +170,7 @@ async function main() {
     });
 
     // Guardar cliente
-    $('#guardarCliente').click(async function () {
+    $('#guardar').click(async function () {
         const clienteData = {
             Sexo_ID: $('#sexoCliente').val(),
             Distrito_Codigo: $('#distritonCliente').val(),
@@ -191,7 +184,7 @@ async function main() {
             FechaNacimiento: $('#fechaNacimiento').val()
         };
 
-        if (!clienteData.Nombre || !clienteData.NumDoc || !clienteData.Telefono || !clienteData.Correo) {
+        if (Object.values(clienteData).some(value => !value)) {
             alert("Por favor completa todos los campos obligatorios.");
             return;
         }
@@ -210,11 +203,9 @@ async function main() {
             if (data.success) {
                 $('#tablaClientes').DataTable().ajax.reload();
                 limpiarModal();
-                $('#clienteModal').modal('hide');
-                clienteId = null;
+                $('#modal-nuevo').modal('hide');
             } else {
                 alert(`Error: ${data.message}`);
-                clienteId = null;
             }
         } catch (error) {
             console.error("Error al guardar cliente:", error);

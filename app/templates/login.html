@@ -1,25 +1,75 @@
 <!doctype html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Registro</title>
-    <link rel="stylesheet" href="../static/css/style_login.css" type="text/css">
     <link rel="icon" href="" type="image/png">
+    <link rel="stylesheet" href="../static/css/style_login.css">
+    <!-- Toastr -->
+    <link rel="stylesheet" href="../static/plugins/toastr/toastr.min.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../static/plugins/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../static/dist/css/adminlte.min.css">
 </head>
-<body>
-    <div class="container">
-        <h1>Registro</h1>
-        <form id="loginForm">
-            <label for="Usuario">Usuario:</label>
-            <input type="text" id="usuario" name="usuario" required>
-            
-            <label for="Clave">Clave:</label>
-            <input type="password" id="clave" name="clave" required>
-            
-            <button type="submit">Login</button>
-        </form>
+
+<body class="hold-transition login-page custom-login-background">
+    <div class="login-box">
+        <div class="card card-outline card-success">
+            <div class="card-header text-center">
+                <a href="#" class="h1"><b>AMECAR</b></a>
+            </div>
+
+            <div class="card">
+                <div class="card-body login-card-body">
+                    <p class="login-box-msg">Ingrese su usuario y contraseña</p>
+
+                    <!-- Formulario -->
+                    <form id="loginForm">
+                        <!-- Campo de correo electrónico -->
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="usuario" placeholder="Usuario" required>
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-user"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campo de contraseña -->
+                        <div class="input-group mb-3">
+                            <input type="password" class="form-control" id="clave" placeholder="Contraseña" required>
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón de envío -->
+                        <button type="submit" class="btn btn-success btn-block">Ingresar</button>
+                    </form>
+                </div>
+                <!-- /.login-card-body -->
+            </div>
+        </div>
     </div>
 
+    <!-- jQuery -->
+    <script src="../static/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="../static/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="../static/dist/js/adminlte.min.js"></script>
+    <!-- Toastr -->
+    <script src="../static/plugins/toastr/toastr.min.js"></script>
+
     <script src="../static/js/login.js"></script>
+
 </body>
+
 </html>

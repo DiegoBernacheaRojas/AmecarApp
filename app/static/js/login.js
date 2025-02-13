@@ -30,13 +30,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
             } else {
                 
-                alert('Login fallido. Verifica tus credenciales.');
+                toastr.error('Login fallido. Verifica tus credenciales.');
             }
         })
         .catch(error => {
 
             console.error('Error:', error);
-            alert('Hubo un error en la solicitud.');
+            toastr.error('Hubo un error en la solicitud.');
         });
     });
 });

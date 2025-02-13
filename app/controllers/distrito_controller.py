@@ -6,7 +6,7 @@ from ..utils import login_required
 distrito = Blueprint('distrito', __name__)
 
 @distrito.route('/getAll', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getAll():
     try:
         # Obtener todos los clientes

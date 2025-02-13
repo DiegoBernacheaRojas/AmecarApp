@@ -1,19 +1,22 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_SERVER = os.getenv("DB_SERVER")
+DB_NAME = os.getenv("DB_NAME")
 
 db = SQLAlchemy()
 migrate = None
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'tu_clave_secreta_super_segura'
-                                            #"mssql+pyodbc://USER:CONTRASEÑA@SERVIDOR/BASEDEDATOS?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-        "mssql+pyodbc://@localhost\\SQLEXPRESS/Amecar"
-        "?driver=ODBC+Driver+17+for+SQL+Server&TrustServerCertificate=yes"
-    )
-
+    app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"mssql+pyodbc://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}/{DB_NAME}?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
     db.init_app(app)
 
     # Inicializa Flask-Migrate después de inicializar la aplicación y la base de datos

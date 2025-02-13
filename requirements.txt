@@ -2,3 +2,7 @@ flask
 flask-sqlalchemy
 pyodbc
 flask-migrate
+python-dotenv
+pywin32
+fpdf
+requests

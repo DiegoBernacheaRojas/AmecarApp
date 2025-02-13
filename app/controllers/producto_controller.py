@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, request
 from app import db
-from ..models import Producto
+from ..models import Producto, DetalleVenta
 from ..utils import login_required
 
 producto = Blueprint('producto', __name__)
 
 @producto.route('/getAll', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getAll():
     try:
         productos = Producto.query.filter_by(Estado=True).all()
@@ -36,7 +36,7 @@ def getAll():
         }), 500
 
 @producto.route('/getId/<int:Producto_ID>', methods=['GET'])
-@login_required('Gerente')
+@login_required
 def getId(Producto_ID):
     try:
         producto = Producto.query.get(Producto_ID)
@@ -63,7 +63,7 @@ def getId(Producto_ID):
         }), 500
 
 @producto.route('/register', methods=['POST'])
-@login_required('Gerente')
+@login_required
 def register():
     try:
         data = request.get_json()
@@ -74,6 +74,7 @@ def register():
             Precio = data.get('Precio'),
             Stock = data.get('Stock'),
             FechaIngreso = data.get('FechaIngreso'),
+            Estado = True,
         )
         db.session.add(nuevo_producto)
         db.session.commit()
@@ -91,7 +92,7 @@ def register():
         }), 500
 
 @producto.route('/update/<int:Producto_ID>', methods=['PUT'])
-@login_required('Gerente')
+@login_required
 def update(Producto_ID):
     try:
         data = request.get_json()
@@ -99,12 +100,13 @@ def update(Producto_ID):
         if not producto:
             return jsonify({"success": False, "message": "Producto no encontrado"}), 404
 
-        producto.Subcategoria_ID = data.get('Subcategoria_ID', producto.Subcategoria_ID),
-        producto.CodigoBarras = data.get('CodigoBarras', producto.CodigoBarras),
-        producto.Descripcion = data.get('Descripcion', producto.Descripcion),
-        producto.Precio = data.get('Precio', producto.Precio),
-        producto.Stock = data.get('Stock', producto.Stock),
-        producto.FechaIngreso = data.get('FechaIngreso', producto.FechaIngreso),
+        # Eliminar las comas adicionales que crean tuplas
+        producto.Subcategoria_ID = data.get('Subcategoria_ID', producto.Subcategoria_ID)
+        producto.CodigoBarras = data.get('CodigoBarras', producto.CodigoBarras)
+        producto.Descripcion = data.get('Descripcion', producto.Descripcion)
+        producto.Precio = data.get('Precio', producto.Precio)
+        producto.Stock = data.get('Stock', producto.Stock)
+        producto.FechaIngreso = data.get('FechaIngreso', producto.FechaIngreso)
 
         db.session.commit()
         return jsonify({"success": True, "message": "Producto actualizado con éxito"}), 200
@@ -112,7 +114,7 @@ def update(Producto_ID):
         return jsonify({"success": False, "message": str(e)}), 500
 
 @producto.route('/delete/<int:Producto_ID>', methods=['DELETE'])
-@login_required('Gerente')
+@login_required
 def delete(Producto_ID):
     try:
         producto = Producto.query.get(Producto_ID)
@@ -126,7 +128,7 @@ def delete(Producto_ID):
         return jsonify({"success": False, "message": str(e)}), 500
 
 @producto.route('/desactivar/<int:Producto_ID>', methods=['POST'])
-@login_required('Gerente')
+@login_required
 def desactivar(Producto_ID):
     try:
         producto = Producto.query.get(Producto_ID)
@@ -154,7 +156,7 @@ def desactivar(Producto_ID):
         }), 500
     
 @producto.route('/getCodBarras', methods=['POST'])
-@login_required('Gerente','Empleado')
+@login_required
 def getCodBarras():
     # Obtener el código de barras enviado en el cuerpo de la solicitud
     data = request.get_json()
@@ -183,3 +185,51 @@ def getCodBarras():
     }
 
     return jsonify(producto_data), 200
+
+@producto.route('/productos-mas-vendidos', methods=['GET'])
+@login_required
+def productos_mas_vendidos():
+    try:
+        from sqlalchemy import func
+        ventas_productos = db.session.query(
+            Producto.Producto_ID,
+            Producto.Descripcion,
+            func.sum(DetalleVenta.Cantidad).label('cantidad_vendida')
+        ).join(DetalleVenta, Producto.Producto_ID == DetalleVenta.Producto_ID
+        ).filter(Producto.Estado == True
+        ).group_by(Producto.Producto_ID, Producto.Descripcion  # Se incluye Descripcion en el GROUP BY
+        ).order_by(func.sum(DetalleVenta.Cantidad).desc()
+        ).limit(5).all()
+
+        result = []
+        for prod in ventas_productos:
+            result.append({
+                "Producto_ID": prod.Producto_ID,
+                "nombre": prod.Descripcion,
+                "cantidad": prod.cantidad_vendida
+            })
+        return jsonify({"success": True, "data": result}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+    
+@producto.route('/stock-bajo', methods=['GET'])
+@login_required
+def stock_bajo():
+    try:
+        threshold = 10  # Define el umbral de stock bajo
+        productos = Producto.query.filter(Producto.Estado == True, Producto.Stock < threshold).all()
+        data = []
+        for producto in productos:
+            data.append({
+                "Producto_ID": producto.Producto_ID,
+                "nombre": producto.Descripcion,
+                "stock": producto.Stock,
+                "SubCategoria": producto.subcategoria.Nombre if producto.subcategoria else "",
+                "CodigoBarras": producto.CodigoBarras,
+                "Precio": float(producto.Precio),
+                "FechaIngreso": producto.FechaIngreso.isoformat()
+            })
+        return jsonify({"success": True, "data": data}), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

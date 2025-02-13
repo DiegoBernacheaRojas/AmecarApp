@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes de venta{% endblock %}
+
+{% block content %}
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Reporte de Venta</h1>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-gray-dark">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <label class="h5 mb-0 d-flex align-items-center">
+                            <i class="mr-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                    class="bi bi-newspaper" viewBox="0 0 16 16">
+                                    <path
+                                        d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5z" />
+                                    <path
+                                        d="M2 3h10v2H2zm0 3h4v3H2zm0 4h4v1H2zm0 2h4v1H2zm5-6h2v1H7zm3 0h2v1h-2zM7 8h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2z" />
+                                </svg>
+                            </i>
+                            Reportes de las ventas
+                        </label>
+                        <div class="ml-auto">
+                            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-primary active">
+                                    <input type="radio" name="filtro" id="option_cliente" value="cliente"
+                                        autocomplete="off" checked> Cliente
+                                </label>
+                                <label class="btn btn-primary">
+                                    <input type="radio" name="filtro" id="option_producto" value="producto"
+                                        autocomplete="off"> Producto
+                                </label>
+                                <label class="btn btn-primary">
+                                    <input type="radio" name="filtro" id="option_empleado" value="empleado"
+                                        autocomplete="off"> Empleado
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="card card-white">
+                            <div class="card-body">
+                                <!-- Fila para los Select y Checkbox "Todo" -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="select2-primary">
+                                            <select id="dynamicSelect" class="select2" multiple="multiple" 
+                                                data-placeholder="Seleccione una para firtrar" 
+                                                data-dropdown-css-class="select2-primary" 
+                                                style="width: 100%;">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <div class="icheck-success d-inline">
+                                            <input type="checkbox" id="checkTodo">
+                                            <label for="checkTodo">Todos</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <!-- Fila para las Fechas -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="fechaInicio">Fecha Inicio:</label>
+                                        <input type="date" id="fechaInicio" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="fechaFin">Fecha Fin:</label>
+                                        <input type="date" id="fechaFin" class="form-control">
+                                    </div>
+                                </div>
+                        
+                                <!-- Fila para los Checkboxes de Boleta y Factura -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <div class="icheck-success d-inline">
+                                            <input type="checkbox" id="checkBoleta" checked>
+                                            <label for="checkBoleta">Boleta</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-center">
+                                        <div class="icheck-success d-inline">
+                                            <input type="checkbox" id="checkFactura" checked>
+                                            <label for="checkFactura">Factura</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <!-- Fila para los Botones Visualizar e Imprimir -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button class="btn btn-info w-100" id="btnAplicarFiltros">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-funnel-fill" viewBox="0 0 16 16">
+                                                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5z"/>
+                                            </svg>
+                                            Aplicar Filtros
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button class="btn btn-danger w-100" id="btnDescargarPdf">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filetype-pdf" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM1.6 11.85H0v3.999h.791v-1.342h.803q.43 0 .732-.173.305-.175.463-.474a1.4 1.4 0 0 0 .161-.677q0-.375-.158-.677a1.2 1.2 0 0 0-.46-.477q-.3-.18-.732-.179m.545 1.333a.8.8 0 0 1-.085.38.57.57 0 0 1-.238.241.8.8 0 0 1-.375.082H.788V12.48h.66q.327 0 .512.181.185.183.185.522m1.217-1.333v3.999h1.46q.602 0 .998-.237a1.45 1.45 0 0 0 .595-.689q.196-.45.196-1.084 0-.63-.196-1.075a1.43 1.43 0 0 0-.589-.68q-.396-.234-1.005-.234zm.791.645h.563q.371 0 .609.152a.9.9 0 0 1 .354.454q.118.302.118.753a2.3 2.3 0 0 1-.068.592 1.1 1.1 0 0 1-.196.422.8.8 0 0 1-.334.252 1.3 1.3 0 0 1-.483.082h-.563zm3.743 1.763v1.591h-.79V11.85h2.548v.653H7.896v1.117h1.606v.638z"/>
+                                            </svg>
+                                            Descargar PDF
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <table id="tablaVentas" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Comprador</th>
+                                    <th>N° Documento</th>
+                                    <th>Empleado</th>
+                                    <th>Tipo de pago</th>
+                                    <th>Tipo de venta</th>
+                                    <th>Total</th>
+                                    <th>Fecha de Venta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Productos cargados dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.row -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="../static/js/reporteVentas.js"></script>
+{% endblock %}

@@ -1,16 +1,3 @@
-// Alternar barra lateral
-document.getElementById('toggle-sidebar').addEventListener('click', function () {
-    const sidebar = document.getElementById('sidebar');
-    const header = document.querySelector('.header');
-    const contentWrapper = document.querySelector('.content-wrapper');
-    const footer = document.querySelector('.footer');
-
-    sidebar.classList.toggle('closed');
-    header.classList.toggle('shifted');
-    contentWrapper.classList.toggle('shifted');
-    footer.classList.toggle('shifted');
-});
-
 // Cerrar sesión
 document.getElementById('logout-button').addEventListener('click', async function () {
     try {
@@ -39,10 +26,3 @@ document.getElementById('logout-button').addEventListener('click', async functio
     }
 });
 
-const dropdownButton = document.getElementById('dropdown-admin');
-const dropdownContent = document.getElementById('dropdown-content');
-
-// Alternar la visibilidad del menú desplegable al hacer clic
-dropdownButton.addEventListener('click', () => {
-    dropdownContent.classList.toggle('active');
-});

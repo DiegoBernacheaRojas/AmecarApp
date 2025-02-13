@@ -1,91 +1,19 @@
-/* Estilos básicos para el fondo */
-body {
-    font-family: Arial, sans-serif;
-    color: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+ /* Clase personalizada para el fondo */
+ .custom-login-background {
+    background-image: url('../img/fondoLogin.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     height: 100vh;
-    margin: 0;
-    background-image: url('../img/fondo1.png'); /* Cambia la ruta a la ubicación de tu imagen */
-    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
-    background-position: center; /* Centra la imagen en el fondo */
-    background-repeat: no-repeat; /* Evita que la imagen se repita */
-    transition: background-color 0.3s, color 0.3s;
+    position: relative; /* Permite que la capa de oscurecimiento se superponga */
 }
 
-/* Estilos para el contenedor del formulario */
-.container {
-    background: rgba(255, 255, 255, 0.9); /* Fondo con transparencia */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 20px #292929e3;
-    width: 300px;
-    text-align: center; /* Centra el texto dentro del contenedor */
-}
-/* Estilo para el título */
-h1 {
-    color: #0c62a8; /* Color del texto del título */
-}
-
-/* Estilos para las etiquetas y campos del formulario */
-label {
-    font-size: 18px; /* Tamaño de la fuente para las etiquetas */
-    display: block;
-    margin-bottom: 12px;
-    font-weight: bold;
-    color: #0c62a8; /* Color de las etiquetas */
-    text-align: left;
-}
-
-input {
-    width: 93%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #299deb; /* Borde blanco para los campos de entrada */
-    border-radius: 4px;
-    background-color: #ffffff; /* Fondo negro para los campos de entrada */
-    color: #299deb; /* Color del texto en los campos de entrada */
-}
-
-button {
-    width: 100%;
-    padding: 10px;
-    background-color: #5ec4ff; /* Fondo amarillo para el botón */
-    border: none;
-    border-radius: 4px;
-    color: #ffffff; /* Color del texto del botón */
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #003a7d; /* Fondo azul más oscuro para el hover */
-}
-
-/* Botón de cambio de tema en la esquina inferior derecha */
-#theme-toggle {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    transition: background-color 0.3s, filter 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#theme-toggle img {
+.custom-login-background::before {
+    content: ""; /* Necesario para que el pseudo-elemento funcione */
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    transition: transform 0.3s;
-}
-
-#theme-toggle:hover {
-    background-color: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.5); /* Ajusta la opacidad para oscurecer la imagen */
 }
